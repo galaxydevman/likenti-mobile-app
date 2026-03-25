@@ -1,0 +1,51 @@
+# Dependencies
+node_modules/
+
+# Expo
+.expo/
+.expo-shared/
+
+# Builds
+dist/
+build/
+
+# Caches
+.cache/
+.metro-cache/
+
+# Expo EAS builds / artifacts
+.eas/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Env files (keep example)
+.env
+.env.*
+!.env.example
+
+# TypeScript
+*.tsbuildinfo
+
+# Native build outputs
+android/.gradle/
+android/.idea/
+android/app/build/
+android/app/.cxx/
+android/app/.externalNativeBuild/
+
+ios/build/
+ios/Pods/
+ios/.idea/
+
+# Coverage / test artifacts
+coverage/
+
+# OS / misc
+.DS_Store
+Thumbs.db
+.eslintcache
+
