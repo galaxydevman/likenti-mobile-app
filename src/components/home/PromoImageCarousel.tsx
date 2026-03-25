@@ -1,0 +1,152 @@
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Dimensions, FlatList, NativeScrollEvent, NativeSyntheticEvent, StyleSheet, View } from 'react-native';
+import type { ImageSourcePropType } from 'react-native';
+import { Image } from 'expo-image';
+import { colors } from '../../theme/colors';
+
+const { width: SCREEN_W } = Dimensions.get('window');
+const OUTER_PAD = 16;
+const SLIDE_W = Math.max(1, SCREEN_W - OUTER_PAD * 2);
+const AUTO_SLIDE_MS = 3000;
+
+export type PromoImageSlide = {
+  id: string;
+  /**
+   * Provide either `imageAsset` (local `require(...)`) OR `imageUrl` (remote URL).
+   * For the demo we use `imageAsset`.
+   */
+  imageAsset?: ImageSourcePropType;
+  imageUrl?: string;
+};
+
+type Props = {
+  slides: PromoImageSlide[];
+  /**
+   * Carousel height. The demo promo banners are typically shorter than the hero.
+   */
+  height?: number;
+};
+
+export function PromoImageCarousel({ slides, height = 220 }: Props) {
+  const [index, setIndex] = useState(0);
+  const listRef = useRef<FlatList<PromoImageSlide> | null>(null);
+
+  const data = useMemo(() => slides, [slides]);
+
+  const onScroll = useCallback(
+    (e: NativeSyntheticEvent<NativeScrollEvent>) => {
+      const x = e.nativeEvent.contentOffset.x;
+      const i = Math.round(x / SLIDE_W);
+      if (i >= 0 && i < data.length) setIndex(i);
+    },
+    [data.length]
+  );
+
+  useEffect(() => {
+    if (data.length <= 1) return;
+    const t = setInterval(() => {
+      const next = (index + 1) % data.length;
+      setIndex(next);
+      listRef.current?.scrollToIndex({ index: next, animated: true });
+    }, AUTO_SLIDE_MS);
+    return () => clearInterval(t);
+  }, [data.length, index]);
+
+  const renderItem = useCallback(
+    ({ item }: { item: PromoImageSlide }) => {
+      if (!item.imageAsset && !item.imageUrl) {
+        return <View style={[styles.slide, { height, backgroundColor: 'rgba(0,0,0,0.05)' }]} />;
+      }
+      const source = item.imageAsset ? item.imageAsset : { uri: item.imageUrl as string };
+      return (
+        <View style={[styles.slide, { height }]}>
+          <Image
+            source={source}
+            style={[styles.slideImage, { height }]}
+            contentFit="cover"
+            transition={200}
+          />
+        </View>
+      );
+    },
+    [height]
+  );
+
+  return (
+    <View style={styles.wrap}>
+      <FlatList
+        ref={listRef}
+        data={data}
+        keyExtractor={(item) => item.id}
+        renderItem={renderItem}
+        horizontal
+        pagingEnabled
+        showsHorizontalScrollIndicator={false}
+        onScroll={onScroll}
+        scrollEventThrottle={16}
+        decelerationRate="fast"
+        getItemLayout={(_, i) => ({
+          length: SLIDE_W,
+          offset: SLIDE_W * i,
+          index: i,
+        })}
+      />
+      <View style={styles.dotStrip} pointerEvents="none">
+        <View style={styles.dots}>
+          {data.map((s, i) => (
+            <View
+              key={s.id}
+              style={[styles.dot, i === index ? styles.dotActive : styles.dotInactive]}
+            />
+          ))}
+        </View>
+      </View>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  wrap: {
+    backgroundColor: colors.pageBg,
+    paddingHorizontal: OUTER_PAD,
+    marginTop: 16,
+  },
+  slide: {
+    width: SLIDE_W,
+    position: 'relative',
+    borderRadius: 20,
+    overflow: 'hidden',
+  },
+  slideImage: {
+    width: '100%',
+    borderRadius: 20,
+  },
+  dotStrip: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    paddingBottom: 10,
+    paddingTop: 16,
+    backgroundColor: 'transparent',
+  },
+  dots: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 6,
+  },
+  dot: {
+    height: 4,
+    borderRadius: 2,
+  },
+  dotActive: {
+    width: 28,
+    backgroundColor: 'rgba(255,255,255,0.95)',
+  },
+  dotInactive: {
+    width: 18,
+    backgroundColor: 'rgba(200,200,200,0.55)',
+  },
+});
+

@@ -4,6 +4,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import { HomeHeader } from '../components/home/HomeHeader';
 import { AnnouncementBar } from '../components/home/AnnouncementBar';
 import { HeroCarousel, type HeroSlide } from '../components/home/HeroCarousel';
+import { PromoImageCarousel, type PromoImageSlide } from '../components/home/PromoImageCarousel';
 import { ShopByCategory, type CategoryItem } from '../components/home/ShopByCategory';
 import { TopPicksPanel, type TopPickProduct } from '../components/home/TopPicksPanel';
 import { colors } from '../theme/colors';
@@ -13,7 +14,8 @@ const HERO_SLIDES: HeroSlide[] = [
   {
     id: '1',
     imageUrl:
-      'https://images.unsplash.com/photo-1556228578-8c89e33adf04?w=900&auto=format&fit=crop&q=80',
+      // Use a known-good demo image (some placeholder entries can appear "empty" at runtime).
+      'https://images.unsplash.com/photo-1522338242992-e1a54906a8da?w=900&auto=format&fit=crop&q=80',
     brandLabel: 'Energie Fruit',
     ctaLabel: 'تسوق الآن',
   },
@@ -102,7 +104,8 @@ const TOP_PICKS: TopPickProduct[] = [
   {
     id: 'tp1',
     title: 'Vichy 72 Hours Stress Resist Excessive Perspiration Deodorant 50ml',
-    imageUrl: 'https://images.unsplash.com/photo-1556228578-8c89e33adf04?w=600&auto=format&fit=crop&q=80',
+    // Use a known-good demo image so the first card doesn't render blank.
+    imageUrl: 'https://images.unsplash.com/photo-1612817288484-6f916006741a?w=600&auto=format&fit=crop&q=80',
     saveLabel: 'Save 41%',
     oldPrice: '₹44.94',
     newPrice: '₹76.25',
@@ -151,6 +154,14 @@ const TOP_PICKS: TopPickProduct[] = [
   },
 ];
 
+const PROMO_SLIDES: PromoImageSlide[] = [
+  { id: 'ps1', imageAsset: require('../../assets/demo/promo-slide-1.png') },
+  { id: 'ps2', imageAsset: require('../../assets/demo/promo-slide-2.png') },
+  { id: 'ps3', imageAsset: require('../../assets/demo/promo-slide-3.png') },
+  { id: 'ps4', imageAsset: require('../../assets/demo/promo-slide-4.png') },
+  { id: 'ps5', imageAsset: require('../../assets/demo/promo-slide-5.png') },
+];
+
 export default function HomeScreen() {
   useFocusEffect(
     useCallback(() => {
@@ -170,6 +181,7 @@ export default function HomeScreen() {
       <HeroCarousel slides={HERO_SLIDES} />
       <ShopByCategory categories={CATEGORIES} />
       <TopPicksPanel title="Likenti Top Picks" products={TOP_PICKS} />
+      <PromoImageCarousel slides={PROMO_SLIDES} height={200} />
     </ScrollView>
   );
 }
