@@ -58,7 +58,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     paddingHorizontal: 16,
     fontSize: 26,
-    fontWeight: '800',
+    fontWeight: '400',
     color: colors.textDark,
     marginBottom: 10,
   },

@@ -59,7 +59,7 @@ const styles = StyleSheet.create({
   },
   logo: {
     width: 168,
-    height: 72,
+    height: 48,
     maxWidth: '72%',
   },
   icons: {
