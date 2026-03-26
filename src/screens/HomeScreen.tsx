@@ -5,6 +5,7 @@ import { HomeHeader } from '../components/home/HomeHeader';
 import { AnnouncementBar } from '../components/home/AnnouncementBar';
 import { HeroCarousel, type HeroSlide } from '../components/home/HeroCarousel';
 import { PromoImageCarousel, type PromoImageSlide } from '../components/home/PromoImageCarousel';
+import { ShopifyGridImageSlider, type ShopifyGridImageSlide } from '../components/home/ShopifyGridImageSlider';
 import { ShopByCategory, type CategoryItem } from '../components/home/ShopByCategory';
 import { TopPicksPanel, type TopPickProduct } from '../components/home/TopPicksPanel';
 import { colors } from '../theme/colors';
@@ -162,6 +163,14 @@ const PROMO_SLIDES: PromoImageSlide[] = [
   { id: 'ps5', imageAsset: require('../../assets/demo/promo-slide-5.png') },
 ];
 
+const GRID_SLIDES: ShopifyGridImageSlide[] = [
+  { id: 'gs1', imageAsset: require('../../assets/demo/shopify-grid-slide-1.png') },
+  { id: 'gs2', imageAsset: require('../../assets/demo/shopify-grid-slide-2.png') },
+  { id: 'gs3', imageAsset: require('../../assets/demo/shopify-grid-slide-3.png') },
+  { id: 'gs4', imageAsset: require('../../assets/demo/shopify-grid-slide-4.png') },
+  { id: 'gs5', imageAsset: require('../../assets/demo/shopify-grid-slide-5.png') },
+];
+
 export default function HomeScreen() {
   useFocusEffect(
     useCallback(() => {
@@ -182,6 +191,7 @@ export default function HomeScreen() {
       <ShopByCategory categories={CATEGORIES} />
       <TopPicksPanel title="Likenti Top Picks" products={TOP_PICKS} />
       <PromoImageCarousel slides={PROMO_SLIDES} height={200} />
+      <ShopifyGridImageSlider slides={GRID_SLIDES} />
     </ScrollView>
   );
 }

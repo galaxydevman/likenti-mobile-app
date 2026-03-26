@@ -30,6 +30,7 @@ type Props = {
 export function PromoImageCarousel({ slides, height = 220 }: Props) {
   const [index, setIndex] = useState(0);
   const listRef = useRef<FlatList<PromoImageSlide> | null>(null);
+  const indexRef = useRef(index);
 
   const data = useMemo(() => slides, [slides]);
 
@@ -37,27 +38,35 @@ export function PromoImageCarousel({ slides, height = 220 }: Props) {
     (e: NativeSyntheticEvent<NativeScrollEvent>) => {
       const x = e.nativeEvent.contentOffset.x;
       const i = Math.round(x / SLIDE_W);
-      if (i >= 0 && i < data.length) setIndex(i);
+      if (i >= 0 && i < data.length) {
+        indexRef.current = i;
+        setIndex(i);
+      }
     },
     [data.length]
   );
 
   useEffect(() => {
+    indexRef.current = index;
+  }, [index]);
+
+  useEffect(() => {
     if (data.length <= 1) return;
     const t = setInterval(() => {
-      const next = (index + 1) % data.length;
+      const next = (indexRef.current + 1) % data.length;
+      indexRef.current = next;
       setIndex(next);
       listRef.current?.scrollToIndex({ index: next, animated: true });
     }, AUTO_SLIDE_MS);
     return () => clearInterval(t);
-  }, [data.length, index]);
+  }, [data.length]);
 
   const renderItem = useCallback(
     ({ item }: { item: PromoImageSlide }) => {
       if (!item.imageAsset && !item.imageUrl) {
         return <View style={[styles.slide, { height, backgroundColor: 'rgba(0,0,0,0.05)' }]} />;
       }
-      const source = item.imageAsset ? item.imageAsset : { uri: item.imageUrl as string };
+      const source = item.imageAsset ? item.imageAsset : { uri: item.imageUrl ?? '' };
       return (
         <View style={[styles.slide, { height }]}>
           <Image
