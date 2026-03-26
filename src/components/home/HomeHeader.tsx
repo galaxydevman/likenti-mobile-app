@@ -10,16 +10,14 @@ const DEFAULT_LOGO = require('../../../assets/icon/likenti_logo_transparent_whit
 type Props = {
   /** Override the default LikEnti lockup (icon + wordmark + tagline in one image). */
   logoSource?: ImageSourcePropType;
-  onPressCart?: () => void;
-  onPressMenu?: () => void;
+  onPressNotification?: () => void;
   searchPlaceholder?: string;
   onSearchChange?: (q: string) => void;
 };
 
 export function HomeHeader({
   logoSource = DEFAULT_LOGO,
-  onPressCart,
-  onPressMenu,
+  onPressNotification,
   searchPlaceholder = 'Rechercher',
   onSearchChange,
 }: Props) {
@@ -32,11 +30,8 @@ export function HomeHeader({
           <Image source={logoSource} style={styles.logo} resizeMode="contain" />
         </View>
         <View style={styles.icons}>
-          <Pressable onPress={onPressCart} hitSlop={12} style={styles.iconBtn}>
-            <Ionicons name="cart-outline" size={26} color={colors.white} />
-          </Pressable>
-          <Pressable onPress={onPressMenu} hitSlop={12} style={styles.iconBtn}>
-            <Ionicons name="menu" size={28} color={colors.white} />
+          <Pressable onPress={onPressNotification} hitSlop={12} style={styles.iconBtn}>
+            <Ionicons name="notifications-outline" size={26} color={colors.white} />
           </Pressable>
         </View>
       </View>
