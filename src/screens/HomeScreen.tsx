@@ -1,5 +1,5 @@
-import React, { useCallback } from 'react';
-import { ScrollView, StyleSheet, StatusBar as RNStatusBar } from 'react-native';
+import React, { useCallback, useRef } from 'react';
+import { Animated, StyleSheet, StatusBar as RNStatusBar } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { HomeHeader } from '../components/home/HomeHeader';
 import { AnnouncementBar } from '../components/home/AnnouncementBar';
@@ -172,6 +172,8 @@ const GRID_SLIDES: ShopifyGridImageSlide[] = [
 ];
 
 export default function HomeScreen() {
+  const scrollY = useRef(new Animated.Value(0)).current;
+
   useFocusEffect(
     useCallback(() => {
       RNStatusBar.setBarStyle('light-content');
@@ -180,19 +182,24 @@ export default function HomeScreen() {
   );
 
   return (
-    <ScrollView
+    <Animated.ScrollView
       style={styles.root}
       contentContainerStyle={styles.content}
       showsVerticalScrollIndicator={false}
+      stickyHeaderIndices={[0]}
+      onScroll={Animated.event([{ nativeEvent: { contentOffset: { y: scrollY } } }], {
+        useNativeDriver: false,
+      })}
+      scrollEventThrottle={16}
     >
-      <HomeHeader />
+      <HomeHeader scrollY={scrollY} />
       {/* <AnnouncementBar /> */}
       <HeroCarousel slides={HERO_SLIDES} />
       <ShopByCategory categories={CATEGORIES} />
       <TopPicksPanel title="Likenti Top Picks" products={TOP_PICKS} />
       <PromoImageCarousel slides={PROMO_SLIDES} height={200} />
       <ShopifyGridImageSlider slides={GRID_SLIDES} />
-    </ScrollView>
+    </Animated.ScrollView>
   );
 }
 
