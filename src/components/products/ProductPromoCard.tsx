@@ -19,6 +19,7 @@ type Props = {
   item: ProductPromoCardItem;
   cardWidth: number;
   cardHeight?: number; // default designed for 400px tall
+  onPressCard?: () => void;
   onPressHeart?: () => void;
   onPressAdd?: () => void;
 };
@@ -27,6 +28,7 @@ export function ProductPromoCard({
   item,
   cardWidth,
   cardHeight = 400,
+  onPressCard,
   onPressHeart,
   onPressAdd,
 }: Props) {
@@ -37,7 +39,7 @@ export function ProductPromoCard({
   const savePillH = Math.round(32 * scale);
 
   return (
-    <View style={[styles.card, { width: cardWidth, height: cardHeight }]}>
+    <Pressable style={[styles.card, { width: cardWidth, height: cardHeight }]} onPress={onPressCard}>
       <View style={[styles.imageArea, { height: imageH }]}>
         <Image
           source={{ uri: item.imageUrl }}
@@ -118,7 +120,7 @@ export function ProductPromoCard({
           <Text style={styles.ratingText}>{item.rating.toFixed(1)}</Text>
         </View>
       </View>
-    </View>
+    </Pressable>
   );
 }
 

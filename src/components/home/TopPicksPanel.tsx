@@ -8,6 +8,7 @@ export type TopPickProduct = ProductPromoCardItem;
 type Props = {
   title?: string;
   products: TopPickProduct[];
+  onPressItem?: (item: TopPickProduct) => void;
   onPressAdd?: (item: TopPickProduct) => void;
 };
 
@@ -24,7 +25,7 @@ const CARD_W = Math.max(
 );
 const CARD_H = 400;
 
-export function TopPicksPanel({ title = 'Likenti Top Picks', products, onPressAdd }: Props) {
+export function TopPicksPanel({ title = 'Likenti Top Picks', products, onPressItem, onPressAdd }: Props) {
   const keyExtractor = useMemo(() => (item: TopPickProduct) => item.id, []);
 
   return (
@@ -40,6 +41,7 @@ export function TopPicksPanel({ title = 'Likenti Top Picks', products, onPressAd
               item={item}
               cardWidth={CARD_W}
               cardHeight={CARD_H}
+              onPressCard={() => onPressItem?.(item)}
               onPressAdd={() => onPressAdd?.(item)}
             />
           </View>

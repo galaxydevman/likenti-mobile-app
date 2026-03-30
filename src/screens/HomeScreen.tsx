@@ -1,6 +1,7 @@
 import React, { useCallback, useRef } from 'react';
 import { Animated, StyleSheet, StatusBar as RNStatusBar } from 'react-native';
-import { useFocusEffect } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { HomeHeader } from '../components/home/HomeHeader';
 import { AnnouncementBar } from '../components/home/AnnouncementBar';
 import { HeroCarousel, type HeroSlide } from '../components/home/HeroCarousel';
@@ -10,6 +11,7 @@ import { ShopByCategory, type CategoryItem } from '../components/home/ShopByCate
 import { TopPicksPanel, type TopPickProduct } from '../components/home/TopPicksPanel';
 import { colors } from '../theme/colors';
 import { useCart } from '../context/CartContext';
+import type { RootStackParamList } from '../navigation/types';
 
 /** Placeholder imagery; replace with Storefront API (collections, metaobjects, files). */
 const HERO_SLIDES: HeroSlide[] = [
@@ -175,6 +177,7 @@ const GRID_SLIDES: ShopifyGridImageSlide[] = [
 export default function HomeScreen() {
   const scrollY = useRef(new Animated.Value(0)).current;
   const { addItem } = useCart();
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
   const parsePrice = (priceText: string) =>
     Number.parseFloat(priceText.replace(/[^0-9.]/g, '')) || 0;
@@ -204,6 +207,7 @@ export default function HomeScreen() {
       <TopPicksPanel
         title="Likenti Top Picks"
         products={TOP_PICKS}
+        onPressItem={(item) => navigation.navigate('ProductDetail', { product: item })}
         onPressAdd={(item) =>
           addItem({
             id: item.id,

@@ -1,21 +1,18 @@
 import React from 'react';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'react-native';
 import HomeScreen from '../screens/HomeScreen';
 import PlaceholderScreen from '../screens/PlaceholderScreen';
 import CartScreen from '../screens/CartScreen';
+import ProductDetailScreen from '../screens/ProductDetailScreen';
 import { colors } from '../theme/colors';
 import { useCart } from '../context/CartContext';
-
-export type RootTabParamList = {
-  Nuhdeek: undefined;
-  Home: undefined;
-  Cart: undefined;
-  More: undefined;
-};
+import type { RootStackParamList, RootTabParamList } from './types';
 
 const Tab = createBottomTabNavigator<RootTabParamList>();
+const Stack = createNativeStackNavigator<RootStackParamList>();
 const HOME_LOGO = require('../../assets/icon/likenti_logo_transparent_white.png');
 
 function NuhdeekTab() {
@@ -25,13 +22,20 @@ function MoreTab() {
   return <PlaceholderScreen title="More" />;
 }
 
-export default function RootNavigator() {
+function TabsNavigator() {
   const { lineCount } = useCart();
 
   return (
     <Tab.Navigator
       screenOptions={{
         headerShown: false,
+        animation: 'fade',
+        transitionSpec: {
+          animation: 'timing',
+          config: {
+            duration: 220,
+          },
+        },
         tabBarActiveTintColor: colors.headerBlue,
         tabBarInactiveTintColor: '#8e8e93',
         tabBarStyle: {
@@ -77,5 +81,18 @@ export default function RootNavigator() {
         }}
       />
     </Tab.Navigator>
+  );
+}
+
+export default function RootNavigator() {
+  return (
+    <Stack.Navigator>
+      <Stack.Screen name="Tabs" component={TabsNavigator} options={{ headerShown: false }} />
+      <Stack.Screen
+        name="ProductDetail"
+        component={ProductDetailScreen}
+        options={{ title: 'Product details', headerBackTitle: 'Back' }}
+      />
+    </Stack.Navigator>
   );
 }
