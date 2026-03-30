@@ -1,6 +1,6 @@
 /** Brand palette aligned with Expanse / LIKENTI storefront */
 export const colors = {
-  headerBlue: '#2472A9',
+  headerBlue: 'rgba(36, 114, 169, 0.97)',
   headerBlueDeep: '#2d5682',
   announcementBlue: '#1a3550',
   searchBarFill: 'rgba(255, 255, 255, 0.22)',

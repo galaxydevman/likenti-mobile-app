@@ -9,6 +9,7 @@ import { ShopifyGridImageSlider, type ShopifyGridImageSlide } from '../component
 import { ShopByCategory, type CategoryItem } from '../components/home/ShopByCategory';
 import { TopPicksPanel, type TopPickProduct } from '../components/home/TopPicksPanel';
 import { colors } from '../theme/colors';
+import { useCart } from '../context/CartContext';
 
 /** Placeholder imagery; replace with Storefront API (collections, metaobjects, files). */
 const HERO_SLIDES: HeroSlide[] = [
@@ -53,7 +54,7 @@ const HERO_SLIDES: HeroSlide[] = [
 const CATEGORIES: CategoryItem[] = [
   {
     id: 'c1',
-    title: 'Cleaner',
+    title: 'All Categories',
     imageUrl:
       'https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=400&auto=format&fit=crop&q=80',
   },
@@ -173,6 +174,10 @@ const GRID_SLIDES: ShopifyGridImageSlide[] = [
 
 export default function HomeScreen() {
   const scrollY = useRef(new Animated.Value(0)).current;
+  const { addItem } = useCart();
+
+  const parsePrice = (priceText: string) =>
+    Number.parseFloat(priceText.replace(/[^0-9.]/g, '')) || 0;
 
   useFocusEffect(
     useCallback(() => {
@@ -196,7 +201,22 @@ export default function HomeScreen() {
       {/* <AnnouncementBar /> */}
       <HeroCarousel slides={HERO_SLIDES} />
       <ShopByCategory categories={CATEGORIES} />
-      <TopPicksPanel title="Likenti Top Picks" products={TOP_PICKS} />
+      <TopPicksPanel
+        title="Likenti Top Picks"
+        products={TOP_PICKS}
+        onPressAdd={(item) =>
+          addItem({
+            id: item.id,
+            title: item.title,
+            variantTitle: 'Default',
+            imageUrl: item.imageUrl,
+            unitPrice: parsePrice(item.newPrice),
+            compareAtPrice: parsePrice(item.oldPrice),
+            quantity: 1,
+            inventoryNote: 'Ships in 24 hours',
+          })
+        }
+      />
       <PromoImageCarousel slides={PROMO_SLIDES} height={200} />
       <ShopifyGridImageSlider slides={GRID_SLIDES} />
     </Animated.ScrollView>

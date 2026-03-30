@@ -8,6 +8,7 @@ export type TopPickProduct = ProductPromoCardItem;
 type Props = {
   title?: string;
   products: TopPickProduct[];
+  onPressAdd?: (item: TopPickProduct) => void;
 };
 
 const { width: SCREEN_W } = Dimensions.get('window');
@@ -23,7 +24,7 @@ const CARD_W = Math.max(
 );
 const CARD_H = 400;
 
-export function TopPicksPanel({ title = 'Likenti Top Picks', products }: Props) {
+export function TopPicksPanel({ title = 'Likenti Top Picks', products, onPressAdd }: Props) {
   const keyExtractor = useMemo(() => (item: TopPickProduct) => item.id, []);
 
   return (
@@ -35,7 +36,12 @@ export function TopPicksPanel({ title = 'Likenti Top Picks', products }: Props) 
         keyExtractor={keyExtractor}
         renderItem={({ item, index }) => (
           <View style={{ marginRight: index === products.length - 1 ? 0 : GAP }}>
-            <ProductPromoCard item={item} cardWidth={CARD_W} cardHeight={CARD_H} />
+            <ProductPromoCard
+              item={item}
+              cardWidth={CARD_W}
+              cardHeight={CARD_H}
+              onPressAdd={() => onPressAdd?.(item)}
+            />
           </View>
         )}
         horizontal
