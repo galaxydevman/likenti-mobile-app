@@ -8,6 +8,7 @@ import PlaceholderScreen from '../screens/PlaceholderScreen';
 import CartScreen from '../screens/CartScreen';
 import ProductDetailScreen from '../screens/ProductDetailScreen';
 import SearchScreen from '../screens/SearchScreen';
+import ProductListScreen from '../screens/ProductListScreen';
 import { colors } from '../theme/colors';
 import { useCart } from '../context/CartContext';
 import type { RootStackParamList, RootTabParamList } from './types';
@@ -105,6 +106,11 @@ export default function RootNavigator() {
         options={{ title: 'Product details', headerBackTitle: 'Back' }}
       />
       <Stack.Screen name="Search" component={SearchScreen} options={{ title: 'Search', headerBackTitle: 'Back' }} />
+      <Stack.Screen
+        name="ProductList"
+        component={ProductListScreen}
+        options={({ route }) => ({ title: route.params.categoryTitle, headerBackTitle: 'Back' })}
+      />
     </Stack.Navigator>
   );
 }

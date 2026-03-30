@@ -12,6 +12,7 @@ import { TopPicksPanel, type TopPickProduct } from '../components/home/TopPicksP
 import { colors } from '../theme/colors';
 import { useCart } from '../context/CartContext';
 import type { RootStackParamList } from '../navigation/types';
+import { CATALOG_PRODUCTS, PRODUCT_CATEGORIES } from '../data/productCatalog';
 
 /** Placeholder imagery; replace with Storefront API (collections, metaobjects, files). */
 const HERO_SLIDES: HeroSlide[] = [
@@ -53,110 +54,7 @@ const HERO_SLIDES: HeroSlide[] = [
   },
 ];
 
-const CATEGORIES: CategoryItem[] = [
-  {
-    id: 'c1',
-    title: 'All Categories',
-    imageUrl:
-      'https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=400&auto=format&fit=crop&q=80',
-  },
-  {
-    id: 'c2',
-    title: 'Moisturizing',
-    imageUrl:
-      'https://images.unsplash.com/photo-1611930022073-b7a4ba5fcccd?w=400&auto=format&fit=crop&q=80',
-  },
-  {
-    id: 'c3',
-    title: 'Serums',
-    imageUrl:
-      'https://images.unsplash.com/photo-1608248597279-f99d160bfcbc?w=400&auto=format&fit=crop&q=80',
-  },
-  {
-    id: 'c4',
-    title: 'Sun care',
-    imageUrl:
-      'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=400&auto=format&fit=crop&q=80',
-  },
-  {
-    id: 'c5',
-    title: 'Hair care',
-    imageUrl:
-      'https://images.unsplash.com/photo-1522338242992-e1a54906a8da?w=400&auto=format&fit=crop&q=80',
-  },
-  {
-    id: 'c6',
-    title: 'Body lotion',
-    imageUrl:
-      'https://images.unsplash.com/photo-1612817288484-6f916006741a?w=400&auto=format&fit=crop&q=80',
-  },
-  {
-    id: 'c7',
-    title: 'Bath essentials',
-    imageUrl:
-      'https://images.unsplash.com/photo-1571781926291-c477ebfd024b?w=400&auto=format&fit=crop&q=80',
-  },
-  {
-    id: 'c8',
-    title: 'Supplements',
-    imageUrl:
-      'https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=400&auto=format&fit=crop&q=80',
-  },
-];
-
-const TOP_PICKS: TopPickProduct[] = [
-  {
-    id: 'tp1',
-    title: 'Vichy 72 Hours Stress Resist Excessive Perspiration Deodorant 50ml',
-    // Use a known-good demo image so the first card doesn't render blank.
-    imageUrl: 'https://images.unsplash.com/photo-1612817288484-6f916006741a?w=600&auto=format&fit=crop&q=80',
-    saveLabel: 'Save 41%',
-    oldPrice: '₹44.94',
-    newPrice: '₹76.25',
-    badgeLabel: 'Express',
-    rating: 4.1,
-  },
-  {
-    id: 'tp2',
-    title: 'Veet Wax Strips For Sensitive Skin 20 pcs',
-    imageUrl: 'https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=600&auto=format&fit=crop&q=80',
-    saveLabel: 'ONLINE EXCLUSIVE _ Save 51%',
-    oldPrice: '₹24.96',
-    newPrice: '₹50.91',
-    badgeLabel: 'Express',
-    rating: 4.7,
-  },
-  {
-    id: 'tp3',
-    title: 'Aroma Therapy Body Wash Lavender 500ml',
-    imageUrl: 'https://images.unsplash.com/photo-1571781926291-c477ebfd024b?w=600&auto=format&fit=crop&q=80',
-    saveLabel: 'Save 33%',
-    oldPrice: '₹18.90',
-    newPrice: '₹28.40',
-    badgeLabel: 'Express',
-    rating: 4.3,
-  },
-  {
-    id: 'tp4',
-    title: 'Skincare Serum Vitamin C 30ml',
-    imageUrl: 'https://images.unsplash.com/photo-1522338242992-e1a54906a8da?w=600&auto=format&fit=crop&q=80',
-    saveLabel: 'Save 29%',
-    oldPrice: '₹24.50',
-    newPrice: '₹34.80',
-    badgeLabel: 'Express',
-    rating: 4.6,
-  },
-  {
-    id: 'tp5',
-    title: 'Hair Care Conditioner Repair 250ml',
-    imageUrl: 'https://images.unsplash.com/photo-1612817288484-6f916006741a?w=600&auto=format&fit=crop&q=80',
-    saveLabel: 'Save 20%',
-    oldPrice: '₹15.20',
-    newPrice: '₹19.00',
-    badgeLabel: 'Express',
-    rating: 4.0,
-  },
-];
+const TOP_PICKS: TopPickProduct[] = CATALOG_PRODUCTS.slice(0, 5).map(({ categoryIds: _categoryIds, ...product }) => product);
 
 const PROMO_SLIDES: PromoImageSlide[] = [
   { id: 'ps1', imageAsset: require('../../assets/demo/promo-slide-1.png') },
@@ -182,6 +80,17 @@ export default function HomeScreen() {
   const parsePrice = (priceText: string) =>
     Number.parseFloat(priceText.replace(/[^0-9.]/g, '')) || 0;
 
+  const categories: CategoryItem[] = PRODUCT_CATEGORIES.map((category) => ({
+    id: category.id,
+    title: category.title,
+    imageUrl: category.imageUrl,
+    onPress: () =>
+      navigation.navigate('ProductList', {
+        categoryId: category.id,
+        categoryTitle: category.title,
+      }),
+  }));
+
   useFocusEffect(
     useCallback(() => {
       RNStatusBar.setBarStyle('light-content');
@@ -203,7 +112,7 @@ export default function HomeScreen() {
       <HomeHeader scrollY={scrollY} onSearchPress={() => navigation.navigate('Search')} />
       {/* <AnnouncementBar /> */}
       <HeroCarousel slides={HERO_SLIDES} />
-      <ShopByCategory categories={CATEGORIES} />
+      <ShopByCategory categories={categories} />
       <TopPicksPanel
         title="Likenti Top Picks"
         products={TOP_PICKS}

@@ -23,4 +23,5 @@ export type RootStackParamList = {
   Tabs: NavigatorScreenParams<RootTabParamList> | undefined;
   ProductDetail: { product: ProductDetailProduct };
   Search: undefined;
+  ProductList: { categoryId: string; categoryTitle: string };
 };
