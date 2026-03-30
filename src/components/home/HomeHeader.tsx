@@ -13,6 +13,7 @@ type Props = {
   onPressNotification?: () => void;
   searchPlaceholder?: string;
   onSearchChange?: (q: string) => void;
+  onSearchPress?: () => void;
   scrollY?: Animated.Value;
 };
 
@@ -21,6 +22,7 @@ export function HomeHeader({
   onPressNotification,
   searchPlaceholder = 'Rechercher',
   onSearchChange,
+  onSearchPress,
   scrollY,
 }: Props) {
   const insets = useSafeAreaInsets();
@@ -71,7 +73,12 @@ export function HomeHeader({
           </View>
         </View>
       </Animated.View>
-      <HomeSearchBar placeholder={searchPlaceholder} onChangeText={onSearchChange} />
+      <HomeSearchBar
+        placeholder={searchPlaceholder}
+        onChangeText={onSearchChange}
+        onFocus={onSearchPress}
+        onPressSearch={onSearchPress}
+      />
     </View>
   );
 }

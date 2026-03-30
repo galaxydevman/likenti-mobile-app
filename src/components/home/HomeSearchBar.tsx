@@ -1,11 +1,13 @@
 import React from 'react';
-import { View, TextInput, StyleSheet, Pressable, Alert } from 'react-native';
+import { View, TextInput, StyleSheet, Pressable, Alert, Text } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../../theme/colors';
 
 type Props = {
   placeholder?: string;
   onChangeText?: (text: string) => void;
+  onFocus?: () => void;
+  onPressSearch?: () => void;
   onPressQrScanner?: () => void;
   onPressFavourite?: () => void;
 };
@@ -13,22 +15,29 @@ type Props = {
 export function HomeSearchBar({
   placeholder = 'Rechercher',
   onChangeText,
+  onFocus,
+  onPressSearch,
   onPressQrScanner,
   onPressFavourite,
 }: Props) {
   return (
     <View style={styles.outerRow}>
-      <View style={styles.searchBarRow}>
+      <Pressable style={styles.searchBarRow} onPress={onPressSearch}>
         <View style={styles.leftIcon}>
           <Ionicons name="search" size={22} color={colors.textLabel} />
         </View>
-        <TextInput
-          placeholder={placeholder}
-          placeholderTextColor="rgba(51, 51, 51, 0.35)"
-          style={styles.input}
-          onChangeText={onChangeText}
-          returnKeyType="search"
-        />
+        {onPressSearch ? (
+          <Text style={styles.placeholderText}>{placeholder}</Text>
+        ) : (
+          <TextInput
+            placeholder={placeholder}
+            placeholderTextColor="rgba(51, 51, 51, 0.35)"
+            style={styles.input}
+            onChangeText={onChangeText}
+            onFocus={onFocus}
+            returnKeyType="search"
+          />
+        )}
         <Pressable
           onPress={onPressQrScanner ?? (() => Alert.alert('QR Scanner', 'Coming soon'))}
           hitSlop={12}
@@ -36,7 +45,7 @@ export function HomeSearchBar({
         >
           <Ionicons name="qr-code-outline" size={22} color={colors.headerBlue} />
         </Pressable>
-      </View>
+      </Pressable>
 
       <Pressable
         onPress={onPressFavourite ?? (() => Alert.alert('Favoris', 'Coming soon'))}
@@ -69,6 +78,12 @@ const styles = StyleSheet.create({
     fontSize: 17,
     color: colors.textDark,
     paddingVertical: 10,
+    marginHorizontal: 6,
+  },
+  placeholderText: {
+    flex: 1,
+    fontSize: 17,
+    color: 'rgba(51, 51, 51, 0.35)',
     marginHorizontal: 6,
   },
   leftIcon: {

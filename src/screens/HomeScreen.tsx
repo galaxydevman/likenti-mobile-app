@@ -200,7 +200,7 @@ export default function HomeScreen() {
       })}
       scrollEventThrottle={16}
     >
-      <HomeHeader scrollY={scrollY} />
+      <HomeHeader scrollY={scrollY} onSearchPress={() => navigation.navigate('Search')} />
       {/* <AnnouncementBar /> */}
       <HeroCarousel slides={HERO_SLIDES} />
       <ShopByCategory categories={CATEGORIES} />

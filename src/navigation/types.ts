@@ -15,10 +15,12 @@ export type RootTabParamList = {
   Nuhdeek: undefined;
   Home: undefined;
   Cart: undefined;
+  Account: undefined;
   More: undefined;
 };
 
 export type RootStackParamList = {
   Tabs: NavigatorScreenParams<RootTabParamList> | undefined;
   ProductDetail: { product: ProductDetailProduct };
+  Search: undefined;
 };
