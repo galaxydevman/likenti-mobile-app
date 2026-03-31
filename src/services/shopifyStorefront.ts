@@ -26,12 +26,26 @@ type ShopifyProductNode = {
 type ProductsResponse = {
   products?: {
     nodes: ShopifyProductNode[];
+    pageInfo: {
+      hasNextPage: boolean;
+      endCursor: string | null;
+    };
   };
   collectionByHandle?: {
     products: {
       nodes: ShopifyProductNode[];
+      pageInfo: {
+        hasNextPage: boolean;
+        endCursor: string | null;
+      };
     };
   } | null;
+};
+
+export type StorefrontProductsPage = {
+  items: ProductDetailProduct[];
+  hasNextPage: boolean;
+  endCursor: string | null;
 };
 
 function getStorefrontConfig() {
@@ -108,15 +122,16 @@ async function storefrontQuery<T>(query: string, variables: Record<string, unkno
 export async function fetchStorefrontProducts(params: {
   categoryId: string;
   categoryTitle: string;
+  afterCursor?: string | null;
   pageSize?: number;
-}): Promise<ProductDetailProduct[]> {
+}): Promise<StorefrontProductsPage> {
   const pageSize = params.pageSize ?? DEFAULT_PAGE_SIZE;
   const isAllCategory = params.categoryId === 'all';
 
   const query = isAllCategory
     ? `
-      query Products($first: Int!) {
-        products(first: $first, sortKey: BEST_SELLING) {
+      query Products($first: Int!, $after: String) {
+        products(first: $first, sortKey: BEST_SELLING, after: $after) {
           nodes {
             id
             title
@@ -145,13 +160,17 @@ export async function fetchStorefrontProducts(params: {
               }
             }
           }
+          pageInfo {
+            hasNextPage
+            endCursor
+          }
         }
       }
     `
     : `
-      query CollectionProducts($first: Int!, $handle: String!) {
+      query CollectionProducts($first: Int!, $handle: String!, $after: String) {
         collectionByHandle(handle: $handle) {
-          products(first: $first) {
+          products(first: $first, after: $after) {
             nodes {
               id
               title
@@ -179,6 +198,10 @@ export async function fetchStorefrontProducts(params: {
                   currencyCode
                 }
               }
+            }
+            pageInfo {
+              hasNextPage
+              endCursor
             }
           }
         }
@@ -186,21 +209,24 @@ export async function fetchStorefrontProducts(params: {
     `;
 
   const variables = isAllCategory
-    ? { first: pageSize }
+    ? { first: pageSize, after: params.afterCursor ?? null }
     : {
         first: pageSize,
         handle: params.categoryId,
+        after: params.afterCursor ?? null,
       };
 
   const data = await storefrontQuery<ProductsResponse>(query, variables);
-  const nodes = isAllCategory ? data.products?.nodes ?? [] : data.collectionByHandle?.products.nodes ?? [];
+  const connection = isAllCategory ? data.products : data.collectionByHandle?.products;
+  const nodes = connection?.nodes ?? [];
+  const pageInfo = connection?.pageInfo;
 
   // If a category handle does not exist in Shopify, fall back to title-based filter over all products.
-  if (!isAllCategory && nodes.length === 0) {
+  if (!isAllCategory && !params.afterCursor && nodes.length === 0) {
     const allData = await storefrontQuery<ProductsResponse>(
       `
-        query Products($first: Int!) {
-          products(first: $first, sortKey: BEST_SELLING) {
+        query Products($first: Int!, $after: String) {
+          products(first: $first, sortKey: BEST_SELLING, after: $after) {
             nodes {
               id
               title
@@ -229,17 +255,30 @@ export async function fetchStorefrontProducts(params: {
                 }
               }
             }
+            pageInfo {
+              hasNextPage
+              endCursor
+            }
           }
         }
       `,
-      { first: pageSize }
+      { first: pageSize, after: null }
     );
 
     const normalizedTitle = params.categoryTitle.trim().toLowerCase();
-    return (allData.products?.nodes ?? [])
+    const filtered = (allData.products?.nodes ?? [])
       .filter((node) => node.productType?.toLowerCase().includes(normalizedTitle))
       .map(toProductDetailProduct);
+    return {
+      items: filtered,
+      hasNextPage: false,
+      endCursor: null,
+    };
   }
 
-  return nodes.map(toProductDetailProduct);
+  return {
+    items: nodes.map(toProductDetailProduct),
+    hasNextPage: pageInfo?.hasNextPage ?? false,
+    endCursor: pageInfo?.endCursor ?? null,
+  };
 }

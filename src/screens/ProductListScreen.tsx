@@ -18,18 +18,25 @@ export default function ProductListScreen({ route, navigation }: Props) {
   const { addItem } = useCart();
   const [products, setProducts] = useState<ProductDetailProduct[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [endCursor, setEndCursor] = useState<string | null>(null);
+  const [hasNextPage, setHasNextPage] = useState(true);
 
-  const loadProducts = useCallback(async () => {
+  const loadProducts = useCallback(async (isRefresh = false) => {
     setLoading(true);
     setErrorMessage(null);
     try {
-      const items = await fetchStorefrontProducts({ categoryId, categoryTitle });
-      setProducts(items);
+      const result = await fetchStorefrontProducts({ categoryId, categoryTitle, pageSize: 50 });
+      setProducts(result.items);
+      setHasNextPage(result.hasNextPage);
+      setEndCursor(result.endCursor);
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Could not load products from Shopify.';
       setErrorMessage(message);
-      setProducts([]);
+      if (!isRefresh) {
+        setProducts([]);
+      }
     } finally {
       setLoading(false);
     }
@@ -38,6 +45,29 @@ export default function ProductListScreen({ route, navigation }: Props) {
   useEffect(() => {
     void loadProducts();
   }, [loadProducts]);
+
+  const loadMoreProducts = useCallback(async () => {
+    if (loading || loadingMore || !hasNextPage) return;
+
+    setLoadingMore(true);
+    setErrorMessage(null);
+    try {
+      const result = await fetchStorefrontProducts({
+        categoryId,
+        categoryTitle,
+        pageSize: 50,
+        afterCursor: endCursor,
+      });
+      setProducts((prev) => [...prev, ...result.items]);
+      setHasNextPage(result.hasNextPage);
+      setEndCursor(result.endCursor);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Could not load more products.';
+      setErrorMessage(message);
+    } finally {
+      setLoadingMore(false);
+    }
+  }, [categoryId, categoryTitle, endCursor, hasNextPage, loading, loadingMore]);
 
   const onPressAdd = (item: ProductDetailProduct) => {
     addItem({
@@ -62,12 +92,14 @@ export default function ProductListScreen({ route, navigation }: Props) {
         columnWrapperStyle={styles.row}
         ListHeaderComponent={<Text style={styles.heading}>{categoryTitle}</Text>}
         refreshing={loading}
-        onRefresh={loadProducts}
+        onRefresh={() => loadProducts(true)}
+        onEndReached={loadMoreProducts}
+        onEndReachedThreshold={0.35}
         ListFooterComponent={
-          loading ? (
+          loading || loadingMore ? (
             <View style={styles.loadingWrap}>
               <ActivityIndicator size="small" color={colors.headerBlue} />
-              <Text style={styles.loadingText}>Loading products...</Text>
+              <Text style={styles.loadingText}>{loadingMore ? 'Loading more products...' : 'Loading products...'}</Text>
             </View>
           ) : null
         }
