@@ -1,11 +1,11 @@
-import React, { useMemo } from 'react';
-import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
+import React, { useCallback, useEffect, useState } from 'react';
+import { ActivityIndicator, FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
 import { Image } from 'expo-image';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { colors } from '../theme/colors';
-import { getProductsByCategory } from '../data/productCatalog';
 import { useCart } from '../context/CartContext';
 import type { ProductDetailProduct, RootStackParamList } from '../navigation/types';
+import { fetchStorefrontProducts } from '../services/shopifyStorefront';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'ProductList'>;
 
@@ -16,8 +16,28 @@ function parsePrice(priceText: string): number {
 export default function ProductListScreen({ route, navigation }: Props) {
   const { categoryId, categoryTitle } = route.params;
   const { addItem } = useCart();
+  const [products, setProducts] = useState<ProductDetailProduct[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const products = useMemo(() => getProductsByCategory(categoryId), [categoryId]);
+  const loadProducts = useCallback(async () => {
+    setLoading(true);
+    setErrorMessage(null);
+    try {
+      const items = await fetchStorefrontProducts({ categoryId, categoryTitle });
+      setProducts(items);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Could not load products from Shopify.';
+      setErrorMessage(message);
+      setProducts([]);
+    } finally {
+      setLoading(false);
+    }
+  }, [categoryId, categoryTitle]);
+
+  useEffect(() => {
+    void loadProducts();
+  }, [loadProducts]);
 
   const onPressAdd = (item: ProductDetailProduct) => {
     addItem({
@@ -41,7 +61,24 @@ export default function ProductListScreen({ route, navigation }: Props) {
         contentContainerStyle={styles.content}
         columnWrapperStyle={styles.row}
         ListHeaderComponent={<Text style={styles.heading}>{categoryTitle}</Text>}
-        ListEmptyComponent={<Text style={styles.emptyText}>No products found in this category.</Text>}
+        refreshing={loading}
+        onRefresh={loadProducts}
+        ListFooterComponent={
+          loading ? (
+            <View style={styles.loadingWrap}>
+              <ActivityIndicator size="small" color={colors.headerBlue} />
+              <Text style={styles.loadingText}>Loading products...</Text>
+            </View>
+          ) : null
+        }
+        ListEmptyComponent={
+          loading ? null : (
+            <View>
+              {errorMessage ? <Text style={styles.errorText}>{errorMessage}</Text> : null}
+              <Text style={styles.emptyText}>No products found in this category.</Text>
+            </View>
+          )
+        }
         renderItem={({ item }) => (
           <Pressable style={styles.card} onPress={() => navigation.navigate('ProductDetail', { product: item })}>
             <Image source={{ uri: item.imageUrl }} style={styles.image} contentFit="cover" />
@@ -87,6 +124,23 @@ const styles = StyleSheet.create({
     color: colors.textLabel,
     fontSize: 15,
     marginTop: 20,
+  },
+  errorText: {
+    color: '#B91C1C',
+    fontSize: 14,
+    marginTop: 16,
+  },
+  loadingWrap: {
+    marginTop: 16,
+    marginBottom: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+  },
+  loadingText: {
+    color: colors.textLabel,
+    fontSize: 13,
+    fontWeight: '500',
   },
   card: {
     flex: 1,
