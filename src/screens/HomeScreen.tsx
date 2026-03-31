@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Animated, StyleSheet, StatusBar as RNStatusBar } from 'react-native';
+import { Animated, Linking, StyleSheet, StatusBar as RNStatusBar } from 'react-native';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { HomeHeader } from '../components/home/HomeHeader';
@@ -13,10 +13,10 @@ import { colors } from '../theme/colors';
 import { useCart } from '../context/CartContext';
 import type { RootStackParamList } from '../navigation/types';
 import { CATALOG_PRODUCTS, PRODUCT_CATEGORIES } from '../data/productCatalog';
-import { fetchStorefrontMainMenuCategories } from '../services/shopify';
+import { fetchStorefrontHeroBanners, fetchStorefrontMainMenuCategories } from '../services/shopify';
 
 /** Placeholder imagery; replace with Storefront API (collections, metaobjects, files). */
-const HERO_SLIDES: HeroSlide[] = [
+const DEFAULT_HERO_SLIDES: HeroSlide[] = [
   {
     id: '1',
     imageUrl:
@@ -78,6 +78,7 @@ export default function HomeScreen() {
   const { addItem } = useCart();
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const [menuCategories, setMenuCategories] = useState<CategoryItem[] | null>(null);
+  const [heroSlides, setHeroSlides] = useState<HeroSlide[] | null>(null);
 
   const parsePrice = (priceText: string) =>
     Number.parseFloat(priceText.replace(/[^0-9.]/g, '')) || 0;
@@ -106,6 +107,43 @@ export default function HomeScreen() {
       }
     };
     void loadMenuCategories();
+    return () => {
+      alive = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    let alive = true;
+    const loadHeroBanners = async () => {
+      try {
+        const banners = await fetchStorefrontHeroBanners();
+        if (!alive || banners.length === 0) return;
+
+        const slides: HeroSlide[] = banners.map((banner) => ({
+          id: banner.id,
+          imageUrl: banner.imageUrl,
+          title: banner.title,
+          subtitle: banner.subtitle,
+          ctaLabel: banner.buttonText,
+          onCtaPress: banner.buttonLink
+            ? () => {
+                void (async () => {
+                  const canOpen = await Linking.canOpenURL(banner.buttonLink);
+                  if (canOpen) {
+                    await Linking.openURL(banner.buttonLink);
+                  }
+                })();
+              }
+            : undefined,
+        }));
+        setHeroSlides(slides);
+      } catch {
+        if (alive) {
+          setHeroSlides(null);
+        }
+      }
+    };
+    void loadHeroBanners();
     return () => {
       alive = false;
     };
@@ -145,7 +183,7 @@ export default function HomeScreen() {
     >
       <HomeHeader scrollY={scrollY} onSearchPress={() => navigation.navigate('Search')} />
       {/* <AnnouncementBar /> */}
-      <HeroCarousel slides={HERO_SLIDES} />
+      <HeroCarousel slides={heroSlides ?? DEFAULT_HERO_SLIDES} />
       <ShopByCategory categories={categories} />
       <TopPicksPanel
         title="Likenti Top Picks"

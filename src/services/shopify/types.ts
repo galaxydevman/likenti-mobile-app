@@ -88,3 +88,39 @@ export type FetchStorefrontProductsParams = {
   afterCursor?: string | null;
   pageSize?: number;
 };
+
+export type ShopifyMetaobjectField = {
+  key: string;
+  value: string | null;
+  reference?:
+    | {
+        __typename: 'MediaImage';
+        image?: { url: string } | null;
+      }
+    | {
+        __typename: string;
+      }
+    | null;
+};
+
+export type ShopifyMetaobjectNode = {
+  id: string;
+  handle: string;
+  fields: ShopifyMetaobjectField[];
+};
+
+export type HeroBannersResponse = {
+  metaobjects?: {
+    nodes: ShopifyMetaobjectNode[];
+  } | null;
+};
+
+export type StorefrontHeroBanner = {
+  id: string;
+  title: string;
+  subtitle?: string;
+  imageUrl: string;
+  buttonText?: string;
+  buttonLink?: string;
+  order: number;
+};

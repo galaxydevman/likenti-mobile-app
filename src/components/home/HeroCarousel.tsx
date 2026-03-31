@@ -19,6 +19,8 @@ const HERO_H = 400;
 export type HeroSlide = {
   id: string;
   imageUrl: string;
+  title?: string;
+  subtitle?: string;
   brandLabel?: string;
   ctaLabel?: string;
   onCtaPress?: () => void;
@@ -46,13 +48,21 @@ export function HeroCarousel({ slides }: Props) {
           contentFit="cover"
           transition={200}
         />
-        {item.brandLabel ? (
+        {item.brandLabel || item.title || item.subtitle || item.ctaLabel ? (
           <View style={styles.slideOverlay} pointerEvents="box-none">
-            <View style={styles.brandPill}>
-              <Text style={styles.brandText} numberOfLines={1}>
-                {item.brandLabel}
+            {item.brandLabel ? (
+              <View style={styles.brandPill}>
+                <Text style={styles.brandText} numberOfLines={1}>
+                  {item.brandLabel}
+                </Text>
+              </View>
+            ) : null}
+            {item.title ? <Text style={styles.title}>{item.title}</Text> : null}
+            {item.subtitle ? (
+              <Text style={styles.subtitle} numberOfLines={2}>
+                {item.subtitle}
               </Text>
-            </View>
+            ) : null}
             {item.ctaLabel ? (
               <Pressable
                 style={styles.cta}
@@ -145,6 +155,19 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: colors.textDark,
     fontWeight: '600',
+  },
+  title: {
+    marginTop: 10,
+    color: colors.white,
+    fontSize: 24,
+    fontWeight: '700',
+    maxWidth: '75%',
+  },
+  subtitle: {
+    marginTop: 8,
+    color: colors.white,
+    fontSize: 14,
+    maxWidth: '75%',
   },
   dotStrip: {
     position: 'absolute',

@@ -19,7 +19,7 @@ type Props = {
 const { width: SCREEN_W } = Dimensions.get('window');
 const CIRCLE = 88;
 const TILE_W = CIRCLE + 6; // keeps 4 tiles fit on most phones
-const OVERLAP_Y = CIRCLE / 2;
+const OVERLAP_Y = 0;
 const ROW_GAP = 12;
 const H_GAP = 12;
 
@@ -34,7 +34,7 @@ export function ShopByCategory({ title, categories }: Props) {
     return pairs;
   }, [categories]);
 
-  const bgTop = title ? OVERLAP_Y + 20 : OVERLAP_Y;
+  const bgTop = title ? 20 : 0;
 
   const renderTile = (c: CategoryItem) => (
     <Pressable key={c.id} style={styles.item} onPress={c.onPress}>
@@ -68,7 +68,7 @@ export function ShopByCategory({ title, categories }: Props) {
 
   return (
     <View style={styles.section}>
-      {/* Transparent top so the hero image shows behind the overlapped first row */}
+      {/* Keep category grid fully visible below hero (no overlap clipping). */}
       <View style={[styles.bg, { top: bgTop }]} pointerEvents="none" />
 
       <View style={styles.content}>
@@ -96,6 +96,9 @@ export function ShopByCategory({ title, categories }: Props) {
 const styles = StyleSheet.create({
   section: {
     position: 'relative',
+    zIndex: 20,
+    elevation: 20,
+    overflow: 'visible',
     paddingBottom: 24,
   },
   bg: {
@@ -105,9 +108,12 @@ const styles = StyleSheet.create({
     top: OVERLAP_Y,
     bottom: 0,
     backgroundColor: colors.pageBg,
+    zIndex: 0,
   },
   content: {
     paddingHorizontal: 16,
+    zIndex: 2,
+    overflow: 'visible',
   },
   sectionTitle: {
     fontSize: 18,
@@ -121,8 +127,9 @@ const styles = StyleSheet.create({
   },
   columnsWrap: {
     flexDirection: 'row',
-    marginTop: -OVERLAP_Y,
+    marginTop: 0,
     gap: H_GAP,
+    zIndex: 3,
   },
   column: {
     width: TILE_W,

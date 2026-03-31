@@ -95,6 +95,59 @@ export const MAIN_MENU_QUERY = `
             }
           }
         }
+        items {
+          id
+          title
+          url
+          resource {
+            __typename
+            ... on Collection {
+              id
+              handle
+              image {
+                url
+              }
+            }
+          }
+          items {
+            id
+            title
+            url
+            resource {
+              __typename
+              ... on Collection {
+                id
+                handle
+                image {
+                  url
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
+export const HERO_BANNERS_QUERY = `
+  query HeroBanners($first: Int!) {
+    metaobjects(type: "hero_banner", first: $first) {
+      nodes {
+        id
+        handle
+        fields {
+          key
+          value
+          reference {
+            __typename
+            ... on MediaImage {
+              image {
+                url
+              }
+            }
+          }
+        }
       }
     }
   }

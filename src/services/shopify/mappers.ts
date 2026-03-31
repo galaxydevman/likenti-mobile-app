@@ -1,5 +1,12 @@
 import type { ProductDetailProduct } from '../../navigation/types';
-import type { MoneyV2, ShopifyMenuItem, ShopifyProductNode, StorefrontMenuCategory } from './types';
+import type {
+  MoneyV2,
+  ShopifyMenuItem,
+  ShopifyMetaobjectNode,
+  ShopifyProductNode,
+  StorefrontHeroBanner,
+  StorefrontMenuCategory,
+} from './types';
 
 function formatMoney(money?: MoneyV2): string {
   if (!money) return '$0.00';
@@ -68,5 +75,48 @@ export function toMenuCategory(item: ShopifyMenuItem): StorefrontMenuCategory | 
     id: toCategoryId(collectionHandle),
     title,
     imageUrl,
+  };
+}
+
+function parseInteger(input: string | null | undefined, fallback = 0): number {
+  if (!input) return fallback;
+  const parsed = Number.parseInt(input, 10);
+  return Number.isFinite(parsed) ? parsed : fallback;
+}
+
+function normalizeOptionalText(input: string | null | undefined): string | undefined {
+  const value = input?.trim();
+  return value ? value : undefined;
+}
+
+function toFieldMap(node: ShopifyMetaobjectNode): Map<string, ShopifyMetaobjectNode['fields'][number]> {
+  const map = new Map<string, ShopifyMetaobjectNode['fields'][number]>();
+  for (const field of node.fields ?? []) {
+    if (field?.key) {
+      map.set(field.key, field);
+    }
+  }
+  return map;
+}
+
+export function toHeroBanner(node: ShopifyMetaobjectNode): StorefrontHeroBanner | null {
+  const fields = toFieldMap(node);
+  const imageField = fields.get('image');
+  const imageUrl = imageField?.reference?.__typename === 'MediaImage' ? imageField.reference.image?.url : null;
+
+  if (!imageUrl) {
+    return null;
+  }
+
+  const title = normalizeOptionalText(fields.get('title')?.value) ?? 'Shop now';
+
+  return {
+    id: node.id,
+    title,
+    subtitle: normalizeOptionalText(fields.get('subtitle')?.value),
+    imageUrl,
+    buttonText: normalizeOptionalText(fields.get('button_text')?.value),
+    buttonLink: normalizeOptionalText(fields.get('button_link')?.value),
+    order: parseInteger(fields.get('order')?.value, 0),
   };
 }
