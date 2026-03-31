@@ -1,4 +1,4 @@
-import React, { useCallback, useRef } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Animated, StyleSheet, StatusBar as RNStatusBar } from 'react-native';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -13,6 +13,7 @@ import { colors } from '../theme/colors';
 import { useCart } from '../context/CartContext';
 import type { RootStackParamList } from '../navigation/types';
 import { CATALOG_PRODUCTS, PRODUCT_CATEGORIES } from '../data/productCatalog';
+import { fetchStorefrontMainMenuCategories } from '../services/shopify';
 
 /** Placeholder imagery; replace with Storefront API (collections, metaobjects, files). */
 const HERO_SLIDES: HeroSlide[] = [
@@ -76,20 +77,53 @@ export default function HomeScreen() {
   const scrollY = useRef(new Animated.Value(0)).current;
   const { addItem } = useCart();
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const [menuCategories, setMenuCategories] = useState<CategoryItem[] | null>(null);
 
   const parsePrice = (priceText: string) =>
     Number.parseFloat(priceText.replace(/[^0-9.]/g, '')) || 0;
 
-  const categories: CategoryItem[] = PRODUCT_CATEGORIES.map((category) => ({
-    id: category.id,
-    title: category.title,
-    imageUrl: category.imageUrl,
-    onPress: () =>
-      navigation.navigate('ProductList', {
-        categoryId: category.id,
-        categoryTitle: category.title,
-      }),
-  }));
+  useEffect(() => {
+    let alive = true;
+    const loadMenuCategories = async () => {
+      try {
+        const items = await fetchStorefrontMainMenuCategories();
+        if (!alive || items.length === 0) return;
+
+        const withAll: CategoryItem[] = [
+          {
+            id: 'all',
+            title: 'All Category',
+            imageUrl:
+              'https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=400&auto=format&fit=crop&q=80',
+          },
+          ...items,
+        ];
+        setMenuCategories(withAll);
+      } catch {
+        if (alive) {
+          setMenuCategories(null);
+        }
+      }
+    };
+    void loadMenuCategories();
+    return () => {
+      alive = false;
+    };
+  }, []);
+
+  const categories: CategoryItem[] = useMemo(() => {
+    const source = menuCategories ?? PRODUCT_CATEGORIES;
+    return source.map((category) => ({
+      id: category.id,
+      title: category.id === 'all' ? 'All Category' : category.title,
+      imageUrl: category.imageUrl,
+      onPress: () =>
+        navigation.navigate('ProductList', {
+          categoryId: category.id,
+          categoryTitle: category.id === 'all' ? 'All Category' : category.title,
+        }),
+    }));
+  }, [menuCategories, navigation]);
 
   useFocusEffect(
     useCallback(() => {

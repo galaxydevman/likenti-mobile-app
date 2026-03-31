@@ -5,7 +5,7 @@ import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { colors } from '../theme/colors';
 import { useCart } from '../context/CartContext';
 import type { ProductDetailProduct, RootStackParamList } from '../navigation/types';
-import { fetchStorefrontProducts } from '../services/shopifyStorefront';
+import { fetchStorefrontProducts } from '../services/shopify';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'ProductList'>;
 

@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { Dimensions, View, Text, StyleSheet, Pressable } from 'react-native';
+import { Dimensions, View, Text, StyleSheet, Pressable, ScrollView } from 'react-native';
 import { Image } from 'expo-image';
 import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../../theme/colors';
@@ -18,29 +18,53 @@ type Props = {
 
 const { width: SCREEN_W } = Dimensions.get('window');
 const CIRCLE = 88;
-const COLUMNS_MAX = 4;
 const TILE_W = CIRCLE + 6; // keeps 4 tiles fit on most phones
 const OVERLAP_Y = CIRCLE / 2;
 const ROW_GAP = 12;
-
-function splitIntoRows<T>(items: T[], columns: number) {
-  const first = items.slice(0, columns);
-  const second = items.slice(columns, columns * 2);
-  return [first, second] as const;
-}
+const H_GAP = 12;
 
 export function ShopByCategory({ title, categories }: Props) {
   const [imageFailed, setImageFailed] = useState<Record<string, boolean>>({});
 
-  const { row1, row2 } = useMemo(() => {
-    const availableW = SCREEN_W - 32; // matches paddingHorizontal
-    const inferred = Math.floor(availableW / TILE_W);
-    const cols = Math.max(2, Math.min(COLUMNS_MAX, inferred));
-    const [r1, r2] = splitIntoRows(categories, cols);
-    return { row1: r1, row2: r2 };
+  const columns = useMemo(() => {
+    const pairs: Array<{ top: CategoryItem; bottom?: CategoryItem }> = [];
+    for (let index = 0; index < categories.length; index += 2) {
+      pairs.push({ top: categories[index], bottom: categories[index + 1] });
+    }
+    return pairs;
   }, [categories]);
 
   const bgTop = title ? OVERLAP_Y + 20 : OVERLAP_Y;
+
+  const renderTile = (c: CategoryItem) => (
+    <Pressable key={c.id} style={styles.item} onPress={c.onPress}>
+      <View style={styles.circle}>
+        <Image
+          source={{ uri: c.imageUrl }}
+          style={styles.circleImage}
+          contentFit="cover"
+          transition={150}
+          onError={() => setImageFailed((prev) => ({ ...prev, [c.id]: true }))}
+          onLoad={() =>
+            setImageFailed((prev) => {
+              if (!prev[c.id]) return prev;
+              const next = { ...prev };
+              delete next[c.id];
+              return next;
+            })
+          }
+        />
+        {imageFailed[c.id] ? (
+          <View style={styles.imagePlaceholder}>
+            <Ionicons name="image-outline" size={28} color={colors.textLabel} />
+          </View>
+        ) : null}
+      </View>
+      <Text style={styles.label} numberOfLines={2}>
+        {c.title}
+      </Text>
+    </Pressable>
+  );
 
   return (
     <View style={styles.section}>
@@ -50,71 +74,20 @@ export function ShopByCategory({ title, categories }: Props) {
       <View style={styles.content}>
         {title ? <Text style={styles.sectionTitle}>{title}</Text> : null}
 
-        <View style={[styles.row, styles.firstRow]}>
-          {row1.map((c) => (
-            <Pressable key={c.id} style={styles.item} onPress={c.onPress}>
-              <View style={styles.circle}>
-                <Image
-                  source={{ uri: c.imageUrl }}
-                  style={styles.circleImage}
-                  contentFit="cover"
-                  transition={150}
-                  onError={() => setImageFailed((prev) => ({ ...prev, [c.id]: true }))}
-                  onLoad={() =>
-                    setImageFailed((prev) => {
-                      if (!prev[c.id]) return prev;
-                      const next = { ...prev };
-                      delete next[c.id];
-                      return next;
-                    })
-                  }
-                />
-                {imageFailed[c.id] ? (
-                  <View style={styles.imagePlaceholder}>
-                    <Ionicons name="image-outline" size={28} color={colors.textLabel} />
-                  </View>
-                ) : null}
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.scrollContent}
+        >
+          <View style={styles.columnsWrap}>
+            {columns.map((column) => (
+              <View key={column.top.id} style={styles.column}>
+                {renderTile(column.top)}
+                {column.bottom ? renderTile(column.bottom) : <View style={styles.itemSpacer} />}
               </View>
-              <Text style={styles.label} numberOfLines={2}>
-                {c.title}
-              </Text>
-            </Pressable>
-          ))}
-        </View>
-
-        {row2.length > 0 ? (
-          <View style={[styles.row, styles.secondRow]}>
-            {row2.map((c) => (
-              <Pressable key={c.id} style={styles.item} onPress={c.onPress}>
-                <View style={styles.circle}>
-                  <Image
-                    source={{ uri: c.imageUrl }}
-                    style={styles.circleImage}
-                    contentFit="cover"
-                    transition={150}
-                    onError={() => setImageFailed((prev) => ({ ...prev, [c.id]: true }))}
-                    onLoad={() =>
-                      setImageFailed((prev) => {
-                        if (!prev[c.id]) return prev;
-                        const next = { ...prev };
-                        delete next[c.id];
-                        return next;
-                      })
-                    }
-                  />
-                  {imageFailed[c.id] ? (
-                    <View style={styles.imagePlaceholder}>
-                      <Ionicons name="image-outline" size={28} color={colors.textLabel} />
-                    </View>
-                  ) : null}
-                </View>
-                <Text style={styles.label} numberOfLines={2}>
-                  {c.title}
-                </Text>
-              </Pressable>
             ))}
           </View>
-        ) : null}
+        </ScrollView>
       </View>
     </View>
   );
@@ -143,19 +116,25 @@ const styles = StyleSheet.create({
     marginTop: 20,
     marginBottom: 14,
   },
-  row: {
+  scrollContent: {
+    paddingRight: Math.max(16, SCREEN_W - (TILE_W * 2 + H_GAP + 32)),
+  },
+  columnsWrap: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  firstRow: {
     marginTop: -OVERLAP_Y,
+    gap: H_GAP,
   },
-  secondRow: {
-    marginTop: ROW_GAP,
+  column: {
+    width: TILE_W,
+    gap: ROW_GAP,
   },
   item: {
     width: TILE_W,
     alignItems: 'center',
+  },
+  itemSpacer: {
+    width: TILE_W,
+    height: CIRCLE + ROW_GAP + 34,
   },
   circle: {
     width: CIRCLE,
