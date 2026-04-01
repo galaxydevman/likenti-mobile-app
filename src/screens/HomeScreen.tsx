@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Animated, Linking, StyleSheet, StatusBar as RNStatusBar } from 'react-native';
+import { Animated, Linking, StyleSheet, StatusBar as RNStatusBar, View } from 'react-native';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { HomeHeader } from '../components/home/HomeHeader';
@@ -181,7 +181,9 @@ export default function HomeScreen() {
       })}
       scrollEventThrottle={16}
     >
-      <HomeHeader scrollY={scrollY} onSearchPress={() => navigation.navigate('Search')} />
+      <View style={styles.stickyHeader}>
+        <HomeHeader scrollY={scrollY} onSearchPress={() => navigation.navigate('Search')} />
+      </View>
       {/* <AnnouncementBar /> */}
       <HeroCarousel slides={heroSlides ?? DEFAULT_HERO_SLIDES} />
       <ShopByCategory categories={categories} />
@@ -215,5 +217,10 @@ const styles = StyleSheet.create({
   },
   content: {
     paddingBottom: 32,
+  },
+  stickyHeader: {
+    zIndex: 200,
+    elevation: 200,
+    backgroundColor: colors.headerBlue,
   },
 });

@@ -102,8 +102,8 @@ export function ShopByCategory({ title, categories }: Props) {
 const styles = StyleSheet.create({
   section: {
     position: 'relative',
-    zIndex: 20,
-    elevation: 20,
+    zIndex: 1,
+    elevation: 1,
     overflow: 'visible',
     paddingBottom: 24,
   },
