@@ -93,6 +93,13 @@ export const MAIN_MENU_QUERY = `
             image {
               url
             }
+            products(first: 1) {
+              nodes {
+                featuredImage {
+                  url
+                }
+              }
+            }
           }
         }
         items {
@@ -107,6 +114,13 @@ export const MAIN_MENU_QUERY = `
               image {
                 url
               }
+              products(first: 1) {
+                nodes {
+                  featuredImage {
+                    url
+                  }
+                }
+              }
             }
           }
           items {
@@ -120,6 +134,13 @@ export const MAIN_MENU_QUERY = `
                 handle
                 image {
                   url
+                }
+                products(first: 1) {
+                  nodes {
+                    featuredImage {
+                      url
+                    }
+                  }
                 }
               }
             }

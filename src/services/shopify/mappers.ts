@@ -66,10 +66,12 @@ export function toMenuCategory(item: ShopifyMenuItem): StorefrontMenuCategory | 
     return null;
   }
 
-  const imageUrl =
-    item.resource?.__typename === 'Collection' && item.resource.image?.url
-      ? item.resource.image.url
-      : `https://via.placeholder.com/300x300?text=${encodeURIComponent(title)}`;
+  const collectionImageUrl =
+    item.resource?.__typename === 'Collection'
+      ? item.resource.image?.url ?? item.resource.products?.nodes?.[0]?.featuredImage?.url
+      : null;
+
+  const imageUrl = collectionImageUrl ?? `https://via.placeholder.com/300x300?text=${encodeURIComponent(title)}`;
 
   return {
     id: toCategoryId(collectionHandle),

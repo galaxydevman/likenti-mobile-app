@@ -52,6 +52,11 @@ export type ShopifyMenuItem = {
         id: string;
         handle: string;
         image?: { url: string } | null;
+        products?: {
+          nodes: Array<{
+            featuredImage?: { url: string } | null;
+          }>;
+        } | null;
       }
     | {
         __typename: 'Product';
