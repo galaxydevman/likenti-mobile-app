@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { Dimensions, View, Text, StyleSheet, Pressable, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, Pressable, ScrollView } from 'react-native';
 import { Image } from 'expo-image';
 import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../../theme/colors';
@@ -16,9 +16,12 @@ type Props = {
   categories: CategoryItem[];
 };
 
-const { width: SCREEN_W } = Dimensions.get('window');
 const CIRCLE = 88;
+const LABEL_LINES = 2;
+const LABEL_LINE_HEIGHT = 18;
+const LABEL_MT = 8;
 const TILE_W = CIRCLE + 6; // keeps 4 tiles fit on most phones
+const TILE_H = CIRCLE + LABEL_MT + LABEL_LINES * LABEL_LINE_HEIGHT;
 const OVERLAP_Y = 0;
 const ROW_GAP = 12;
 const H_GAP = 12;
@@ -77,6 +80,9 @@ export function ShopByCategory({ title, categories }: Props) {
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
+          bounces={false}
+          alwaysBounceHorizontal={false}
+          overScrollMode="never"
           contentContainerStyle={styles.scrollContent}
         >
           <View style={styles.columnsWrap}>
@@ -123,7 +129,7 @@ const styles = StyleSheet.create({
     marginBottom: 14,
   },
   scrollContent: {
-    paddingRight: Math.max(16, SCREEN_W - (TILE_W * 2 + H_GAP + 32)),
+    paddingRight: 16,
   },
   columnsWrap: {
     flexDirection: 'row',
@@ -137,11 +143,12 @@ const styles = StyleSheet.create({
   },
   item: {
     width: TILE_W,
+    minHeight: TILE_H,
     alignItems: 'center',
   },
   itemSpacer: {
     width: TILE_W,
-    height: CIRCLE + ROW_GAP + 34,
+    height: TILE_H,
   },
   circle: {
     width: CIRCLE,
@@ -167,10 +174,12 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(15, 23, 42, 0.04)',
   },
   label: {
-    marginTop: 8,
+    marginTop: LABEL_MT,
     fontSize: 13,
+    lineHeight: LABEL_LINE_HEIGHT,
     color: colors.textLabel,
     textAlign: 'center',
     fontWeight: '500',
+    minHeight: LABEL_LINES * LABEL_LINE_HEIGHT,
   },
 });
