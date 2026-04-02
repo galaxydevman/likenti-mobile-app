@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   View,
   Text,
@@ -14,7 +14,7 @@ import { colors } from '../../theme/colors';
 
 const { width: SCREEN_W } = Dimensions.get('window');
 const SLIDE_W = SCREEN_W;
-const HERO_H = 400;
+const HERO_H = 300;
 
 export type HeroSlide = {
   id: string;
@@ -32,11 +32,29 @@ type Props = {
 
 export function HeroCarousel({ slides }: Props) {
   const [index, setIndex] = useState(0);
+  const listRef = useRef<FlatList<HeroSlide>>(null);
 
   const onScroll = useCallback((e: NativeSyntheticEvent<NativeScrollEvent>) => {
     const x = e.nativeEvent.contentOffset.x;
     const i = Math.round(x / SLIDE_W);
     if (i >= 0 && i < slides.length) setIndex(i);
+  }, [slides.length]);
+
+  useEffect(() => {
+    if (slides.length <= 1) return;
+
+    const timer = setInterval(() => {
+      setIndex((prev) => {
+        const next = (prev + 1) % slides.length;
+        listRef.current?.scrollToOffset({
+          offset: next * SLIDE_W,
+          animated: true,
+        });
+        return next;
+      });
+    }, 5000);
+
+    return () => clearInterval(timer);
   }, [slides.length]);
 
   const renderItem = useCallback(
@@ -45,6 +63,7 @@ export function HeroCarousel({ slides }: Props) {
         <Image
           source={{ uri: item.imageUrl }}
           style={styles.slideImage}
+          // contentFit="fill"
           contentFit="cover"
           transition={200}
         />
@@ -82,6 +101,7 @@ export function HeroCarousel({ slides }: Props) {
   return (
     <View style={styles.wrap}>
       <FlatList
+        ref={listRef}
         data={slides}
         keyExtractor={(item) => item.id}
         renderItem={renderItem}

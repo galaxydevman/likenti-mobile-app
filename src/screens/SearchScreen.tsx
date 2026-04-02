@@ -1,6 +1,10 @@
-import React from 'react';
-import { ScrollView, StyleSheet, Text, View, Pressable } from 'react-native';
+import React, { useCallback, useLayoutEffect, useRef } from 'react';
+import { InteractionManager, ScrollView, StyleSheet, Text, TextInput, View, Pressable } from 'react-native';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { useFocusEffect } from '@react-navigation/native';
 import { colors } from '../theme/colors';
+import { HomeSearchBar } from '../components/home/HomeSearchBar';
+import type { RootStackParamList } from '../navigation/types';
 
 const TRENDING_KEYWORDS = [
   'Vitamin C',
@@ -22,7 +26,50 @@ const TRENDING_CATEGORIES = [
   'Supplements',
 ];
 
-export default function SearchScreen() {
+type Props = NativeStackScreenProps<RootStackParamList, 'Search'>;
+
+export default function SearchScreen({ navigation }: Props) {
+  const searchInputRef = useRef<TextInput>(null);
+
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      title: '',
+      headerTitle: () => (
+        <View style={styles.headerSearchWrap}>
+          <HomeSearchBar
+            placeholder="Search"
+            inputRef={searchInputRef}
+            showFavouriteButton={false}
+            showQrScannerButton={false}
+            autoFocus
+          />
+        </View>
+      ),
+    });
+  }, [navigation]);
+
+  useFocusEffect(
+    useCallback(() => {
+      let cancelled = false;
+      const task = InteractionManager.runAfterInteractions(() => {
+        const tryFocus = () => {
+          if (cancelled) return;
+          searchInputRef.current?.focus();
+        };
+        requestAnimationFrame(() => {
+          tryFocus();
+          setTimeout(tryFocus, 100);
+        });
+      });
+      return () => {
+        cancelled = true;
+        if (typeof task === 'object' && task !== null && 'cancel' in task) {
+          (task as { cancel: () => void }).cancel();
+        }
+      };
+    }, [])
+  );
+
   return (
     <ScrollView style={styles.root} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
       <View style={styles.section}>
@@ -54,6 +101,11 @@ const styles = StyleSheet.create({
   root: {
     flex: 1,
     backgroundColor: colors.pageBg,
+  },
+  headerSearchWrap: {
+    flex: 1,
+    minWidth: 240,
+    paddingRight: 4,
   },
   content: {
     padding: 16,

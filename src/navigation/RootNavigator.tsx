@@ -105,7 +105,11 @@ export default function RootNavigator() {
         component={ProductDetailScreen}
         options={{ title: 'Product details', headerBackTitle: 'Back' }}
       />
-      <Stack.Screen name="Search" component={SearchScreen} options={{ title: 'Search', headerBackTitle: 'Back' }} />
+      <Stack.Screen
+        name="Search"
+        component={SearchScreen}
+        options={{ title: '', headerBackTitle: 'Back', headerTitleAlign: 'left' }}
+      />
       <Stack.Screen
         name="ProductList"
         component={ProductListScreen}
