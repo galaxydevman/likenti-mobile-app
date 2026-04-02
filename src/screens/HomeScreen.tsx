@@ -14,6 +14,7 @@ import type { RootStackParamList } from '../navigation/types';
 import { CATALOG_PRODUCTS, PRODUCT_CATEGORIES } from '../data/productCatalog';
 import { fetchStorefrontHeroBanners, fetchStorefrontMainMenuCategories } from '../services/shopify';
 import { styles } from '../styles/HomeScreen.styles';
+import { useTheme } from '../theme/ThemeContext';
 
 /** Placeholder imagery; replace with Storefront API (collections, metaobjects, files). */
 const DEFAULT_HERO_SLIDES: HeroSlide[] = [
@@ -76,7 +77,9 @@ const GRID_SLIDES: ShopifyGridImageSlide[] = [
 export default function HomeScreen() {
   const scrollY = useRef(new Animated.Value(0)).current;
   const { addItem } = useCart();
+  const { headerTheme } = useTheme();
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const headerBleedColor = headerTheme.gradientColors?.[0] ?? headerTheme.backgroundColor ?? '#1a2744';
   const [menuCategories, setMenuCategories] = useState<CategoryItem[] | null>(null);
   const [heroSlides, setHeroSlides] = useState<HeroSlide[] | null>(null);
 
@@ -119,23 +122,26 @@ export default function HomeScreen() {
         const banners = await fetchStorefrontHeroBanners();
         if (!alive || banners.length === 0) return;
 
-        const slides: HeroSlide[] = banners.map((banner) => ({
-          id: banner.id,
-          imageUrl: banner.imageUrl,
-          title: banner.title,
-          subtitle: banner.subtitle,
-          ctaLabel: banner.buttonText,
-          onCtaPress: banner.buttonLink
-            ? () => {
-                void (async () => {
-                  const canOpen = await Linking.canOpenURL(banner.buttonLink);
-                  if (canOpen) {
-                    await Linking.openURL(banner.buttonLink);
-                  }
-                })();
-              }
-            : undefined,
-        }));
+        const slides: HeroSlide[] = banners.map((banner) => {
+          const link = banner.buttonLink;
+          return {
+            id: banner.id,
+            imageUrl: banner.imageUrl,
+            title: banner.title,
+            subtitle: banner.subtitle,
+            ctaLabel: banner.buttonText,
+            onCtaPress: link
+              ? () => {
+                  void (async () => {
+                    const canOpen = await Linking.canOpenURL(link);
+                    if (canOpen) {
+                      await Linking.openURL(link);
+                    }
+                  })();
+                }
+              : undefined,
+          };
+        });
         setHeroSlides(slides);
       } catch {
         if (alive) {
@@ -165,9 +171,11 @@ export default function HomeScreen() {
 
   useFocusEffect(
     useCallback(() => {
-      RNStatusBar.setBarStyle('light-content');
+      RNStatusBar.setBarStyle(
+        headerTheme.statusBarStyle === 'light' ? 'light-content' : 'dark-content'
+      );
       return () => RNStatusBar.setBarStyle('dark-content');
-    }, [])
+    }, [headerTheme.statusBarStyle])
   );
 
   return (
@@ -181,7 +189,7 @@ export default function HomeScreen() {
       })}
       scrollEventThrottle={16}
     >
-      <View style={styles.stickyHeader}>
+      <View style={[styles.stickyHeader, { backgroundColor: headerBleedColor }]}>
         <HomeHeader scrollY={scrollY} onSearchPress={() => navigation.navigate('Search')} />
       </View>
       {/* <AnnouncementBar /> */}

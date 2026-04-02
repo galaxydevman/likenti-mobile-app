@@ -4,6 +4,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../../theme/colors';
 import { styles } from '../../styles/HomeSearchBar.styles';
 
+type HexColor = string;
+
 type Props = {
   placeholder?: string;
   value?: string;
@@ -19,6 +21,8 @@ type Props = {
   showQrScannerButton?: boolean;
   /** When editable (no `onPressSearch`), attach ref for imperative `focus()` — e.g. search screen header. */
   inputRef?: RefObject<TextInputType | null>;
+  /** Header accent for icons and focused outline (defaults to brand blue). */
+  accentColor?: HexColor;
 };
 
 export function HomeSearchBar({
@@ -34,21 +38,27 @@ export function HomeSearchBar({
   showFavouriteButton = true,
   showQrScannerButton = true,
   inputRef,
+  accentColor = colors.headerBlue,
 }: Props) {
   const [isFocused, setIsFocused] = useState(false);
   const BarWrapper = onPressSearch ? Pressable : View;
   const barWrapperProps = onPressSearch
     ? ({ onPress: onPressSearch } as const)
     : ({} as const);
+  const mutedIcon = isFocused ? accentColor : colors.textLabel;
 
   return (
     <View style={styles.outerRow}>
       <BarWrapper
-        style={[styles.searchBarRow, isFocused && styles.searchBarRowFocused]}
+        style={[
+          styles.searchBarRow,
+          isFocused && styles.searchBarRowFocused,
+          isFocused && { borderColor: accentColor },
+        ]}
         {...barWrapperProps}
       >
         <View style={styles.leftIcon}>
-          <Ionicons name="search" size={22} color={isFocused ? colors.headerBlue : colors.textLabel} />
+          <Ionicons name="search" size={22} color={mutedIcon} />
         </View>
         {onPressSearch ? (
           <Text style={styles.placeholderText}>{placeholder}</Text>
@@ -75,7 +85,7 @@ export function HomeSearchBar({
             hitSlop={12}
             style={styles.rightIcon}
           >
-            <Ionicons name="qr-code-outline" size={22} color={colors.headerBlue} />
+            <Ionicons name="qr-code-outline" size={22} color={accentColor} />
           </Pressable>
         ) : null}
       </BarWrapper>
@@ -86,7 +96,7 @@ export function HomeSearchBar({
           hitSlop={12}
           style={styles.favouriteBtn}
         >
-          <Ionicons name="heart-outline" size={22} color={colors.headerBlue} />
+          <Ionicons name="heart-outline" size={22} color={accentColor} />
         </Pressable>
       ) : null}
     </View>

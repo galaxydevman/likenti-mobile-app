@@ -12,6 +12,5 @@ export const styles = StyleSheet.create({
   stickyHeader: {
     zIndex: 200,
     elevation: 200,
-    backgroundColor: colors.headerBlue,
   },
 });

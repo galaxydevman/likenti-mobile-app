@@ -1,9 +1,7 @@
 import { StyleSheet } from 'react-native';
-import { colors } from '../theme/colors';
 
 export const styles = StyleSheet.create({
   wrap: {
-    backgroundColor: colors.headerBlue,
     paddingHorizontal: 16,
     paddingBottom: 14,
   },
@@ -11,27 +9,37 @@ export const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   topRow: {
-    minHeight: 56,
+    minHeight: 52,
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
   },
-  logoBlock: {
+  topColSide: {
     flex: 1,
-    marginRight: 8,
+    justifyContent: 'center',
+  },
+  topColCenter: {
+    flex: 2,
+    alignItems: 'center',
     justifyContent: 'center',
   },
   logo: {
-    width: 168,
-    height: 48,
-    maxWidth: '72%',
+    width: 156,
+    height: 46,
+    maxWidth: '100%',
   },
-  icons: {
-    flexDirection: 'row',
+  themeBtn: {
+    width: 44,
+    height: 44,
+    borderRadius: 14,
     alignItems: 'center',
-    gap: 4,
+    justifyContent: 'center',
   },
   iconBtn: {
-    padding: 4,
+    width: 44,
+    height: 44,
+    borderRadius: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
+    alignSelf: 'flex-end',
   },
 });
