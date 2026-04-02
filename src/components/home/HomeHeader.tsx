@@ -33,9 +33,11 @@ export function HomeHeader({
 
   const { headerForeground, accentColor, backgroundColor, gradientColors, logoTintColor } = headerTheme;
 
+  const topRowRestHeight = 78;
+
   const topRowHeight = animatedScrollY.interpolate({
     inputRange: [0, 70],
-    outputRange: [56, 0],
+    outputRange: [topRowRestHeight, 0],
     extrapolate: 'clamp',
   });
   const topRowMarginBottom = animatedScrollY.interpolate({
@@ -109,8 +111,8 @@ export function HomeHeader({
     return (
       <LinearGradient
         colors={[gradientColors[0], gradientColors[1]]}
-        start={{ x: 0, y: 0.5 }}
-        end={{ x: 1, y: 0.5 }}
+        start={{ x: 0.5, y: 1 }}
+        end={{ x: 0.5, y: 0 }}
         style={[styles.wrap, { paddingTop }]}
       >
         {inner}

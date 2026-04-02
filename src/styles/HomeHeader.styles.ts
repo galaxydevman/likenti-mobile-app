@@ -9,7 +9,7 @@ export const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   topRow: {
-    minHeight: 52,
+    minHeight: 78,
     flexDirection: 'row',
     alignItems: 'center',
   },
@@ -23,8 +23,8 @@ export const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   logo: {
-    width: 156,
-    height: 46,
+    width: 244,
+    height: 72,
     maxWidth: '100%',
   },
   themeBtn: {
