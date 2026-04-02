@@ -8,7 +8,7 @@ export const HERO_H = 300;
 
 export const styles = StyleSheet.create({
   wrap: {
-    backgroundColor: colors.pageBg,
+    backgroundColor: 'transparent',
   },
   slide: {
     width: SLIDE_W,

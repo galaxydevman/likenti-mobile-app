@@ -11,7 +11,7 @@ export const CARD_H = Math.round(CARD_W * 1.18);
 
 export const styles = StyleSheet.create({
   wrap: {
-    backgroundColor: colors.pageBg,
+    backgroundColor: 'transparent',
     marginTop: 16,
     paddingTop: 6,
   },

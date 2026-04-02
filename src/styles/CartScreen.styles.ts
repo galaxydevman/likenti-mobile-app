@@ -4,7 +4,7 @@ import { colors } from '../theme/colors';
 export const styles = StyleSheet.create({
   root: {
     flex: 1,
-    backgroundColor: colors.pageBg,
+    backgroundColor: 'transparent',
   },
   content: {
     paddingHorizontal: 16,
@@ -265,7 +265,7 @@ export const styles = StyleSheet.create({
   },
   emptyRoot: {
     flex: 1,
-    backgroundColor: colors.pageBg,
+    backgroundColor: 'transparent',
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 24,

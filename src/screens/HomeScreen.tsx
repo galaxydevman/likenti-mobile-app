@@ -180,7 +180,7 @@ export default function HomeScreen() {
 
   return (
     <Animated.ScrollView
-      style={styles.root}
+      style={[styles.root, { backgroundColor: headerTheme.pageBackground }]}
       contentContainerStyle={styles.content}
       showsVerticalScrollIndicator={false}
       stickyHeaderIndices={[0]}

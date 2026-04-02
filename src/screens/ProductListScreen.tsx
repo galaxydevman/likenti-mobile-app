@@ -3,6 +3,7 @@ import { ActivityIndicator, FlatList, Pressable, Text, View } from 'react-native
 import { Image } from 'expo-image';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { colors } from '../theme/colors';
+import { useTheme } from '../theme/ThemeContext';
 import { useCart } from '../context/CartContext';
 import type { ProductDetailProduct, RootStackParamList } from '../navigation/types';
 import { fetchStorefrontProducts } from '../services/shopify';
@@ -16,6 +17,7 @@ function parsePrice(priceText: string): number {
 
 export default function ProductListScreen({ route, navigation }: Props) {
   const { categoryId, categoryTitle } = route.params;
+  const { headerTheme } = useTheme();
   const { addItem } = useCart();
   const [products, setProducts] = useState<ProductDetailProduct[]>([]);
   const [loading, setLoading] = useState(true);
@@ -84,7 +86,7 @@ export default function ProductListScreen({ route, navigation }: Props) {
   };
 
   return (
-    <View style={styles.root}>
+    <View style={[styles.root, { backgroundColor: headerTheme.pageBackground }]}>
       <FlatList
         data={products}
         numColumns={2}

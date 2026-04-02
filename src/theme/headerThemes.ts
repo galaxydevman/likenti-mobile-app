@@ -6,6 +6,8 @@ export type HeaderThemePreset = {
   headerForeground: string;
   /** Search bar accent (icons, focused border) */
   accentColor: string;
+  /** Screen / scroll background tuned to the header */
+  pageBackground: string;
   statusBarStyle: 'light' | 'dark';
   /** Optional tint when the logo asset is white-on-transparent */
   logoTintColor?: string;
@@ -17,6 +19,7 @@ export const HEADER_THEME_PRESETS: HeaderThemePreset[] = [
     backgroundColor: '#1a2744',
     headerForeground: '#FFFFFF',
     accentColor: '#1a2744',
+    pageBackground: '#E8EDF4',
     statusBarStyle: 'light',
   },
   {
@@ -24,6 +27,7 @@ export const HEADER_THEME_PRESETS: HeaderThemePreset[] = [
     backgroundColor: '#f5dde6',
     headerForeground: '#1a2744',
     accentColor: '#1a2744',
+    pageBackground: '#FCF6F8',
     statusBarStyle: 'dark',
     logoTintColor: '#1a2744',
   },
@@ -32,6 +36,7 @@ export const HEADER_THEME_PRESETS: HeaderThemePreset[] = [
     gradientColors: ['#6d4bc8', '#9b7fd9'],
     headerForeground: '#FFFFFF',
     accentColor: '#5c3fb0',
+    pageBackground: '#F3F0FA',
     statusBarStyle: 'light',
   },
   {
@@ -39,6 +44,7 @@ export const HEADER_THEME_PRESETS: HeaderThemePreset[] = [
     gradientColors: ['#0a5c61', '#1ba3ad'],
     headerForeground: '#FFFFFF',
     accentColor: '#0a5c61',
+    pageBackground: '#ECF7F7',
     statusBarStyle: 'light',
   },
 ];

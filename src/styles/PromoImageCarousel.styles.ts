@@ -7,7 +7,7 @@ export const SLIDE_W = Math.max(1, SCREEN_W - OUTER_PAD * 2);
 
 export const styles = StyleSheet.create({
   wrap: {
-    backgroundColor: colors.pageBg,
+    backgroundColor: 'transparent',
     paddingHorizontal: OUTER_PAD,
     marginTop: 16,
   },

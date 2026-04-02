@@ -26,7 +26,7 @@ export const styles = StyleSheet.create({
     right: 0,
     top: OVERLAP_Y,
     bottom: 0,
-    backgroundColor: colors.pageBg,
+    backgroundColor: 'transparent',
     zIndex: 0,
   },
   content: {

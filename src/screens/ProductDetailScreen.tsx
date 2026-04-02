@@ -16,6 +16,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/types';
 import { colors } from '../theme/colors';
+import { useTheme } from '../theme/ThemeContext';
 import { useCart } from '../context/CartContext';
 import { styles } from '../styles/ProductDetailScreen.styles';
 
@@ -35,6 +36,7 @@ export default function ProductDetailScreen({ route, navigation }: Props) {
   const insets = useSafeAreaInsets();
   const { width: windowWidth } = useWindowDimensions();
   const slideWidth = windowWidth - CONTENT_H_PAD * 2;
+  const { headerTheme } = useTheme();
   const { addItem } = useCart();
   const { product } = route.params;
   const [quantity, setQuantity] = useState(1);
@@ -95,7 +97,7 @@ export default function ProductDetailScreen({ route, navigation }: Props) {
   };
 
   return (
-    <View style={styles.root}>
+    <View style={[styles.root, { backgroundColor: headerTheme.pageBackground }]}>
       <ScrollView
         nestedScrollEnabled
         showsVerticalScrollIndicator={false}

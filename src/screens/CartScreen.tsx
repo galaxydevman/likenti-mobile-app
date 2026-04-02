@@ -12,6 +12,7 @@ import { Image } from 'expo-image';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useCart } from '../context/CartContext';
 import { colors } from '../theme/colors';
+import { useTheme } from '../theme/ThemeContext';
 import { styles } from '../styles/CartScreen.styles';
 
 function formatCurrency(value: number): string {
@@ -20,6 +21,7 @@ function formatCurrency(value: number): string {
 
 export default function CartScreen() {
   const insets = useSafeAreaInsets();
+  const { headerTheme } = useTheme();
   const {
     items,
     lineCount,
@@ -58,7 +60,9 @@ export default function CartScreen() {
 
   if (!items.length) {
     return (
-      <View style={[styles.emptyRoot, { paddingTop: insets.top + 16 }]}>
+      <View
+        style={[styles.emptyRoot, { paddingTop: insets.top + 16, backgroundColor: headerTheme.pageBackground }]}
+      >
         <Ionicons name="bag-handle-outline" size={68} color={colors.headerBlue} />
         <Text style={styles.emptyTitle}>Your cart is empty</Text>
         <Text style={styles.emptyText}>
@@ -70,7 +74,7 @@ export default function CartScreen() {
   }
 
   return (
-    <View style={styles.root}>
+    <View style={[styles.root, { backgroundColor: headerTheme.pageBackground }]}>
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={[styles.content, { paddingBottom: 148 + insets.bottom }]}

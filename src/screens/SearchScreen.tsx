@@ -12,6 +12,7 @@ import { Image } from 'expo-image';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useFocusEffect } from '@react-navigation/native';
 import { colors } from '../theme/colors';
+import { useTheme } from '../theme/ThemeContext';
 import { HomeSearchBar } from '../components/home/HomeSearchBar';
 import type { RootStackParamList, ProductDetailProduct } from '../navigation/types';
 import { fetchStorefrontProductSearch } from '../services/shopify';
@@ -49,6 +50,7 @@ function parsePrice(priceText: string): number {
 
 export default function SearchScreen({ navigation }: Props) {
   const { addItem } = useCart();
+  const { headerTheme } = useTheme();
   const searchInputRef = useRef<TextInput>(null);
   const debounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -256,7 +258,7 @@ export default function SearchScreen({ navigation }: Props) {
   );
 
   return (
-    <View style={styles.root}>
+    <View style={[styles.root, { backgroundColor: headerTheme.pageBackground }]}>
       <FlatList
         key={isSearchActive ? 'search-results' : 'search-trending'}
         data={isSearchActive ? products : []}
