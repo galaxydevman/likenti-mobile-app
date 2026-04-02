@@ -15,37 +15,21 @@ export type HeaderThemePreset = {
 
 export const HEADER_THEME_PRESETS: HeaderThemePreset[] = [
   {
-    id: 'navy',
-    backgroundColor: '#1a2744',
+    id: 'dark',
+    gradientColors: ['#0d1730', '#243f79'],
     headerForeground: '#FFFFFF',
-    accentColor: '#1a2744',
-    pageBackground: '#E8EDF4',
+    accentColor: '#1f3d74',
+    pageBackground: '#E8EEF9',
     statusBarStyle: 'light',
   },
   {
-    id: 'blush',
-    backgroundColor: '#f5dde6',
-    headerForeground: '#1a2744',
-    accentColor: '#1a2744',
-    pageBackground: '#FCF6F8',
+    id: 'light',
+    gradientColors: ['#fdf2f8', '#dbeafe'],
+    headerForeground: '#1e2f56',
+    accentColor: '#2f4f87',
+    pageBackground: '#F7FAFF',
     statusBarStyle: 'dark',
-    logoTintColor: '#1a2744',
-  },
-  {
-    id: 'purple',
-    gradientColors: ['#6d4bc8', '#9b7fd9'],
-    headerForeground: '#FFFFFF',
-    accentColor: '#5c3fb0',
-    pageBackground: '#F3F0FA',
-    statusBarStyle: 'light',
-  },
-  {
-    id: 'teal',
-    gradientColors: ['#0a5c61', '#1ba3ad'],
-    headerForeground: '#FFFFFF',
-    accentColor: '#0a5c61',
-    pageBackground: '#ECF7F7',
-    statusBarStyle: 'light',
+    logoTintColor: '#1e2f56',
   },
 ];
 
