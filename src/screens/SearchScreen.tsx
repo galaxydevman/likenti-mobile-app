@@ -11,6 +11,7 @@ import {
 import { Image } from 'expo-image';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useFocusEffect } from '@react-navigation/native';
+import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../theme/colors';
 import { useTheme } from '../theme/ThemeContext';
 import { HomeSearchBar } from '../components/home/HomeSearchBar';
@@ -20,23 +21,77 @@ import { useCart } from '../context/CartContext';
 import { styles } from '../styles/SearchScreen.styles';
 
 const TRENDING_KEYWORDS = [
-  'Vitamin C',
+  'Toothpaste',
+  'Deodorant',
   'Sunscreen',
-  'Hair Serum',
-  'Body Lotion',
-  'Face Wash',
-  'Lip Balm',
-  'Perfume',
-  'Makeup',
+  'Shampoo',
+  'Fragrances',
+  'Lenses',
+  'Napkins',
+  'Baby Diapers',
 ];
 
 const TRENDING_CATEGORIES = [
-  'Skincare',
-  'Hair Care',
-  'Bath & Body',
-  'Makeup',
-  'Fragrance',
-  'Supplements',
+  {
+    id: 'baby-toiletries',
+    label: 'Baby Toiletries',
+    imageUrl:
+      'https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?w=400&auto=format&fit=crop&q=80',
+  },
+  {
+    id: 'oral-care',
+    label: 'Oral Care',
+    imageUrl:
+      'https://images.unsplash.com/photo-1607619056574-7b8d3ee536b2?w=400&auto=format&fit=crop&q=80',
+  },
+  {
+    id: 'sanitary-care',
+    label: 'Sanitary Care',
+    imageUrl:
+      'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=400&auto=format&fit=crop&q=80',
+  },
+  {
+    id: 'deodorant',
+    label: 'Deodorant',
+    imageUrl:
+      'https://images.unsplash.com/photo-1612817288484-6f916006741a?w=400&auto=format&fit=crop&q=80',
+  },
+  {
+    id: 'bath-body',
+    label: 'Bath & Body',
+    imageUrl:
+      'https://images.unsplash.com/photo-1571781926291-c477ebfd024b?w=400&auto=format&fit=crop&q=80',
+  },
+  {
+    id: 'baby-nutrition',
+    label: 'Baby Nutrition',
+    imageUrl:
+      'https://images.unsplash.com/photo-1585435557343-3b092031d4a8?w=400&auto=format&fit=crop&q=80',
+  },
+  {
+    id: 'sport-nutrition',
+    label: 'Sport Nutrition',
+    imageUrl:
+      'https://images.unsplash.com/photo-1593095948071-474c5cc2989d?w=400&auto=format&fit=crop&q=80',
+  },
+  {
+    id: 'healthy-nutrition',
+    label: 'Healthy Nutrition',
+    imageUrl:
+      'https://images.unsplash.com/photo-1607619056574-7b8d3ee536b2?w=400&auto=format&fit=crop&q=80',
+  },
+  {
+    id: 'electrical-hair-devices',
+    label: 'Electrical Hair Devices',
+    imageUrl:
+      'https://images.unsplash.com/photo-1580618672591-eb180b1a973f?w=400&auto=format&fit=crop&q=80',
+  },
+  {
+    id: 'lenses-care',
+    label: 'Lenses Care',
+    imageUrl:
+      'https://images.unsplash.com/photo-1574258495973-f010dfbb5371?w=400&auto=format&fit=crop&q=80',
+  },
 ];
 
 const SEARCH_DEBOUNCE_MS = 400;
@@ -223,6 +278,7 @@ export default function SearchScreen({ navigation }: Props) {
         <View style={styles.keywordsWrap}>
           {TRENDING_KEYWORDS.map((keyword) => (
             <Pressable key={keyword} style={styles.keywordChip} onPress={() => applyKeyword(keyword)}>
+              <Ionicons name="trending-up" size={18} color="#4CAF50" />
               <Text style={styles.keywordText}>{keyword}</Text>
             </Pressable>
           ))}
@@ -233,8 +289,13 @@ export default function SearchScreen({ navigation }: Props) {
         <Text style={styles.sectionTitle}>Trending Categories</Text>
         <View style={styles.categoriesList}>
           {TRENDING_CATEGORIES.map((category) => (
-            <Pressable key={category} style={styles.categoryCard} onPress={() => applyKeyword(category)}>
-              <Text style={styles.categoryText}>{category}</Text>
+            <Pressable key={category.id} style={styles.categoryItem} onPress={() => applyKeyword(category.label)}>
+              <View style={styles.categoryCircle}>
+                <Image source={{ uri: category.imageUrl }} style={styles.categoryImage} contentFit="cover" />
+              </View>
+              <Text style={styles.categoryText} numberOfLines={2}>
+                {category.label}
+              </Text>
             </Pressable>
           ))}
         </View>
