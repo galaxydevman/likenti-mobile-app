@@ -37,6 +37,45 @@ export const PRODUCTS_QUERY = `
   }
 `;
 
+export const PRODUCT_SEARCH_QUERY = `
+  query ProductSearch($first: Int!, $query: String!, $after: String) {
+    products(first: $first, query: $query, after: $after) {
+      nodes {
+        id
+        title
+        productType
+        featuredImage {
+          url
+        }
+        priceRange {
+          minVariantPrice {
+            amount
+            currencyCode
+          }
+          maxVariantPrice {
+            amount
+            currencyCode
+          }
+        }
+        compareAtPriceRange {
+          minVariantPrice {
+            amount
+            currencyCode
+          }
+          maxVariantPrice {
+            amount
+            currencyCode
+          }
+        }
+      }
+      pageInfo {
+        hasNextPage
+        endCursor
+      }
+    }
+  }
+`;
+
 export const COLLECTION_PRODUCTS_QUERY = `
   query CollectionProducts($first: Int!, $handle: String!, $after: String) {
     collectionByHandle(handle: $handle) {

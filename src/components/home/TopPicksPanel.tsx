@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
-import { Dimensions, FlatList, StyleSheet, Text, View } from 'react-native';
-import { colors } from '../../theme/colors';
+import { FlatList, Text, View } from 'react-native';
 import { ProductPromoCard, type ProductPromoCardItem } from '../products/ProductPromoCard';
+import { styles, GAP, OUTER_PAD, CARD_W, CARD_H } from '../../styles/TopPicksPanel.styles';
 
 export type TopPickProduct = ProductPromoCardItem;
 
@@ -11,19 +11,6 @@ type Props = {
   onPressItem?: (item: TopPickProduct) => void;
   onPressAdd?: (item: TopPickProduct) => void;
 };
-
-const { width: SCREEN_W } = Dimensions.get('window');
-const OUTER_PAD = 8;
-const GAP = 10;
-
-// Target: show ~2 cards fully and a 3rd partially on most phones.
-// We intentionally size cards so that the remaining horizontal space reveals the next card.
-const PARTIAL_VISIBLE_COUNT = 2.3;
-const CARD_W = Math.max(
-  150,
-  Math.round((SCREEN_W - OUTER_PAD * 2 - GAP) / PARTIAL_VISIBLE_COUNT)
-);
-const CARD_H = 400;
 
 export function TopPicksPanel({ title = 'Likenti Top Picks', products, onPressItem, onPressAdd }: Props) {
   const keyExtractor = useMemo(() => (item: TopPickProduct) => item.id, []);
@@ -56,19 +43,4 @@ export function TopPicksPanel({ title = 'Likenti Top Picks', products, onPressIt
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  section: {
-    marginTop: 16,
-    paddingTop: 6,
-    paddingBottom: 8,
-  },
-  sectionTitle: {
-    paddingHorizontal: 16,
-    fontSize: 26,
-    fontWeight: '400',
-    color: colors.textDark,
-    marginBottom: 10,
-  },
-});
 

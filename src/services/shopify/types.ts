@@ -94,6 +94,12 @@ export type FetchStorefrontProductsParams = {
   pageSize?: number;
 };
 
+export type FetchStorefrontProductSearchParams = {
+  searchQuery: string;
+  afterCursor?: string | null;
+  pageSize?: number;
+};
+
 export type ShopifyMetaobjectField = {
   key: string;
   value: string | null;

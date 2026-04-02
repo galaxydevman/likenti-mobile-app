@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Animated, Linking, StyleSheet, StatusBar as RNStatusBar, View } from 'react-native';
+import { Animated, Linking, StatusBar as RNStatusBar, View } from 'react-native';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { HomeHeader } from '../components/home/HomeHeader';
@@ -9,11 +9,11 @@ import { PromoImageCarousel, type PromoImageSlide } from '../components/home/Pro
 import { ShopifyGridImageSlider, type ShopifyGridImageSlide } from '../components/home/ShopifyGridImageSlider';
 import { ShopByCategory, type CategoryItem } from '../components/home/ShopByCategory';
 import { TopPicksPanel, type TopPickProduct } from '../components/home/TopPicksPanel';
-import { colors } from '../theme/colors';
 import { useCart } from '../context/CartContext';
 import type { RootStackParamList } from '../navigation/types';
 import { CATALOG_PRODUCTS, PRODUCT_CATEGORIES } from '../data/productCatalog';
 import { fetchStorefrontHeroBanners, fetchStorefrontMainMenuCategories } from '../services/shopify';
+import { styles } from '../styles/HomeScreen.styles';
 
 /** Placeholder imagery; replace with Storefront API (collections, metaobjects, files). */
 const DEFAULT_HERO_SLIDES: HeroSlide[] = [
@@ -209,18 +209,3 @@ export default function HomeScreen() {
     </Animated.ScrollView>
   );
 }
-
-const styles = StyleSheet.create({
-  root: {
-    flex: 1,
-    backgroundColor: colors.pageBg,
-  },
-  content: {
-    paddingBottom: 32,
-  },
-  stickyHeader: {
-    zIndex: 200,
-    elevation: 200,
-    backgroundColor: colors.headerBlue,
-  },
-});

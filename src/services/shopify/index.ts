@@ -1,4 +1,4 @@
-export { fetchStorefrontProducts } from './products';
+export { fetchStorefrontProducts, fetchStorefrontProductSearch } from './products';
 export { fetchStorefrontMainMenuCategories } from './menu';
 export { fetchStorefrontHeroBanners } from './hero';
 export type {
@@ -6,4 +6,5 @@ export type {
   StorefrontHeroBanner,
   StorefrontProductsPage,
   FetchStorefrontProductsParams,
+  FetchStorefrontProductSearchParams,
 } from './types';

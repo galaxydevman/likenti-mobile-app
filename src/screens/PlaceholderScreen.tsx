@@ -1,6 +1,6 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import { colors } from '../theme/colors';
+import { View, Text } from 'react-native';
+import { styles } from '../styles/PlaceholderScreen.styles';
 
 type Props = { title: string };
 
@@ -12,23 +12,3 @@ export default function PlaceholderScreen({ title }: Props) {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  box: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: colors.pageBg,
-    padding: 24,
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: colors.textDark,
-  },
-  sub: {
-    marginTop: 8,
-    fontSize: 15,
-    color: colors.textLabel,
-  },
-});

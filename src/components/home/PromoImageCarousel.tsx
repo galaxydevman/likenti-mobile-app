@@ -1,12 +1,9 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Dimensions, FlatList, NativeScrollEvent, NativeSyntheticEvent, StyleSheet, View } from 'react-native';
+import { FlatList, NativeScrollEvent, NativeSyntheticEvent, View } from 'react-native';
 import type { ImageSourcePropType } from 'react-native';
 import { Image } from 'expo-image';
-import { colors } from '../../theme/colors';
+import { styles, SLIDE_W } from '../../styles/PromoImageCarousel.styles';
 
-const { width: SCREEN_W } = Dimensions.get('window');
-const OUTER_PAD = 16;
-const SLIDE_W = Math.max(1, SCREEN_W - OUTER_PAD * 2);
 const AUTO_SLIDE_MS = 3000;
 
 export type PromoImageSlide = {
@@ -113,49 +110,4 @@ export function PromoImageCarousel({ slides, height = 220 }: Props) {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  wrap: {
-    backgroundColor: colors.pageBg,
-    paddingHorizontal: OUTER_PAD,
-    marginTop: 16,
-  },
-  slide: {
-    width: SLIDE_W,
-    position: 'relative',
-    borderRadius: 20,
-    overflow: 'hidden',
-  },
-  slideImage: {
-    width: '100%',
-    borderRadius: 20,
-  },
-  dotStrip: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    paddingBottom: 10,
-    paddingTop: 16,
-    backgroundColor: 'transparent',
-  },
-  dots: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    gap: 6,
-  },
-  dot: {
-    height: 4,
-    borderRadius: 2,
-  },
-  dotActive: {
-    width: 28,
-    backgroundColor: 'rgba(255,255,255,0.95)',
-  },
-  dotInactive: {
-    width: 18,
-    backgroundColor: 'rgba(200,200,200,0.55)',
-  },
-});
 

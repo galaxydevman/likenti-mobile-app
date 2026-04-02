@@ -1,6 +1,6 @@
 import React from 'react';
-import { Text, StyleSheet, View } from 'react-native';
-import { colors } from '../../theme/colors';
+import { Text, View } from 'react-native';
+import { styles } from '../../styles/AnnouncementBar.styles';
 
 type Props = {
   message?: string;
@@ -17,19 +17,3 @@ export function AnnouncementBar({
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  bar: {
-    backgroundColor: colors.announcementBlue,
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  text: {
-    color: colors.white,
-    fontSize: 12,
-    fontWeight: '500',
-    textAlign: 'center',
-  },
-});

@@ -1,9 +1,10 @@
 import React from 'react';
-import { Animated, View, Pressable, StyleSheet, Image, type ImageSourcePropType } from 'react-native';
+import { Animated, View, Pressable, Image, type ImageSourcePropType } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors } from '../../theme/colors';
 import { HomeSearchBar } from './HomeSearchBar';
+import { styles } from '../../styles/HomeHeader.styles';
 
 const DEFAULT_LOGO = require('../../../assets/icon/likenti_logo_transparent_white.png');
 
@@ -82,38 +83,3 @@ export function HomeHeader({
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  wrap: {
-    backgroundColor: colors.headerBlue,
-    paddingHorizontal: 16,
-    paddingBottom: 14,
-  },
-  topRowContainer: {
-    overflow: 'hidden',
-  },
-  topRow: {
-    minHeight: 56,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  logoBlock: {
-    flex: 1,
-    marginRight: 8,
-    justifyContent: 'center',
-  },
-  logo: {
-    width: 168,
-    height: 48,
-    maxWidth: '72%',
-  },
-  icons: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-  },
-  iconBtn: {
-    padding: 4,
-  },
-});

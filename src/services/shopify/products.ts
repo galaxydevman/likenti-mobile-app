@@ -1,7 +1,12 @@
 import { storefrontQuery } from './client';
 import { toProductDetailProduct } from './mappers';
-import { COLLECTION_PRODUCTS_QUERY, PRODUCTS_QUERY } from './queries';
-import type { FetchStorefrontProductsParams, ProductsResponse, StorefrontProductsPage } from './types';
+import { COLLECTION_PRODUCTS_QUERY, PRODUCTS_QUERY, PRODUCT_SEARCH_QUERY } from './queries';
+import type {
+  FetchStorefrontProductsParams,
+  FetchStorefrontProductSearchParams,
+  ProductsResponse,
+  StorefrontProductsPage,
+} from './types';
 import { DEFAULT_PAGE_SIZE } from './types';
 
 export async function fetchStorefrontProducts(
@@ -41,6 +46,32 @@ export async function fetchStorefrontProducts(
       endCursor: null,
     };
   }
+
+  return {
+    items: nodes.map(toProductDetailProduct),
+    hasNextPage: pageInfo?.hasNextPage ?? false,
+    endCursor: pageInfo?.endCursor ?? null,
+  };
+}
+
+export async function fetchStorefrontProductSearch(
+  params: FetchStorefrontProductSearchParams
+): Promise<StorefrontProductsPage> {
+  const q = params.searchQuery.trim();
+  if (!q) {
+    return { items: [], hasNextPage: false, endCursor: null };
+  }
+
+  const pageSize = params.pageSize ?? DEFAULT_PAGE_SIZE;
+  const data = await storefrontQuery<ProductsResponse>(PRODUCT_SEARCH_QUERY, {
+    first: pageSize,
+    query: q,
+    after: params.afterCursor ?? null,
+  });
+
+  const connection = data.products;
+  const nodes = connection?.nodes ?? [];
+  const pageInfo = connection?.pageInfo;
 
   return {
     items: nodes.map(toProductDetailProduct),
