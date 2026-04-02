@@ -8,6 +8,11 @@ export const PRODUCTS_QUERY = `
         featuredImage {
           url
         }
+        images(first: 20) {
+          nodes {
+            url
+          }
+        }
         priceRange {
           minVariantPrice {
             amount
@@ -46,6 +51,11 @@ export const PRODUCT_SEARCH_QUERY = `
         productType
         featuredImage {
           url
+        }
+        images(first: 20) {
+          nodes {
+            url
+          }
         }
         priceRange {
           minVariantPrice {
@@ -86,6 +96,11 @@ export const COLLECTION_PRODUCTS_QUERY = `
           productType
           featuredImage {
             url
+          }
+          images(first: 20) {
+            nodes {
+              url
+            }
           }
           priceRange {
             minVariantPrice {

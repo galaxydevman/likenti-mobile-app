@@ -1,5 +1,15 @@
-import React, { useMemo, useState } from 'react';
-import { Alert, Pressable, ScrollView, Text, View } from 'react-native';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import {
+  Alert,
+  FlatList,
+  NativeScrollEvent,
+  NativeSyntheticEvent,
+  Pressable,
+  ScrollView,
+  Text,
+  useWindowDimensions,
+  View,
+} from 'react-native';
 import { Image } from 'expo-image';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -19,11 +29,52 @@ function formatCurrency(value: number): string {
   return `$${value.toFixed(2)}`;
 }
 
+const CONTENT_H_PAD = 16;
+
 export default function ProductDetailScreen({ route, navigation }: Props) {
   const insets = useSafeAreaInsets();
+  const { width: windowWidth } = useWindowDimensions();
+  const slideWidth = windowWidth - CONTENT_H_PAD * 2;
   const { addItem } = useCart();
   const { product } = route.params;
   const [quantity, setQuantity] = useState(1);
+  const [galleryIndex, setGalleryIndex] = useState(0);
+  const galleryListRef = useRef<FlatList<string>>(null);
+
+  const imageGallery = useMemo(
+    () => (product.imageUrls?.length ? product.imageUrls : [product.imageUrl]),
+    [product.imageUrl, product.imageUrls],
+  );
+
+  useEffect(() => {
+    setGalleryIndex(0);
+    galleryListRef.current?.scrollToOffset({ offset: 0, animated: false });
+  }, [product.id]);
+
+  useEffect(() => {
+    if (imageGallery.length == 1) return;
+
+    const timer = setInterval(() => {
+      setGalleryIndex((prev) => {
+        const next = (prev + 1) % imageGallery.length;
+        galleryListRef.current?.scrollToOffset({
+          offset: next * slideWidth,
+          animated: true,
+        });
+        return next;
+      });
+    }, 5000);
+
+    return () => clearInterval(timer);
+  }, [imageGallery.length, slideWidth]);
+
+  const onGalleryScroll = useCallback(
+    (e: NativeSyntheticEvent<NativeScrollEvent>) => {
+      const i = Math.round(e.nativeEvent.contentOffset.x / slideWidth);
+      if (i >= 0 && i < imageGallery.length) setGalleryIndex(i);
+    },
+    [imageGallery.length, slideWidth],
+  );
 
   const unitPrice = useMemo(() => parsePrice(product.newPrice), [product.newPrice]);
   const compareAtPrice = useMemo(() => parsePrice(product.oldPrice), [product.oldPrice]);
@@ -46,10 +97,45 @@ export default function ProductDetailScreen({ route, navigation }: Props) {
   return (
     <View style={styles.root}>
       <ScrollView
+        nestedScrollEnabled
         showsVerticalScrollIndicator={false}
         contentContainerStyle={[styles.content, { paddingBottom: 140 + insets.bottom }]}
       >
-        <Image source={{ uri: product.imageUrl }} style={styles.heroImage} contentFit="contain" />
+        <View style={styles.galleryWrap}>
+          <FlatList
+            ref={galleryListRef}
+            data={imageGallery}
+            horizontal
+            pagingEnabled
+            showsHorizontalScrollIndicator={false}
+            keyExtractor={(uri, index) => `${index}-${uri}`}
+            renderItem={({ item }) => (
+              <View style={{ width: slideWidth }}>
+                <Image source={{ uri: item }} style={styles.galleryImage} contentFit="contain" />
+              </View>
+            )}
+            onScroll={onGalleryScroll}
+            scrollEventThrottle={16}
+            getItemLayout={(_, index) => ({
+              length: slideWidth,
+              offset: slideWidth * index,
+              index,
+            })}
+          />
+          {imageGallery.length > 1 ? (
+            <View style={styles.galleryDots}>
+              {imageGallery.map((_, i) => (
+                <View
+                  key={`dot-${i}`}
+                  style={[
+                    styles.galleryDot,
+                    i === galleryIndex ? styles.galleryDotActive : styles.galleryDotInactive,
+                  ]}
+                />
+              ))}
+            </View>
+          ) : null}
+        </View>
 
         <View style={styles.card}>
           <View style={styles.ratingRow}>

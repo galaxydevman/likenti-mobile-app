@@ -9,12 +9,36 @@ export const styles = StyleSheet.create({
   content: {
     padding: 16,
   },
-  heroImage: {
+  galleryWrap: {
+    marginBottom: 14,
+    borderRadius: 20,
+    overflow: 'hidden',
+    backgroundColor: colors.white,
+  },
+  galleryImage: {
     width: '100%',
     height: 320,
-    borderRadius: 20,
     backgroundColor: colors.white,
-    marginBottom: 14,
+  },
+  galleryDots: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 6,
+    paddingVertical: 10,
+    backgroundColor: colors.white,
+  },
+  galleryDot: {
+    height: 4,
+    borderRadius: 2,
+  },
+  galleryDotActive: {
+    width: 22,
+    backgroundColor: colors.headerBlue,
+  },
+  galleryDotInactive: {
+    width: 6,
+    backgroundColor: '#D8E0EB',
   },
   card: {
     backgroundColor: colors.white,

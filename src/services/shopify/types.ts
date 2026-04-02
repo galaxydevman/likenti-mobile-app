@@ -13,6 +13,9 @@ export type ShopifyProductNode = {
   title: string;
   productType: string;
   featuredImage: { url: string } | null;
+  images: {
+    nodes: Array<{ url: string }>;
+  };
   priceRange: {
     minVariantPrice: MoneyV2;
     maxVariantPrice: MoneyV2;

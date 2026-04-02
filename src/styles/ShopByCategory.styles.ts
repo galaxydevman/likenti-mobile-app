@@ -17,7 +17,8 @@ export const styles = StyleSheet.create({
     zIndex: 1,
     elevation: 1,
     overflow: 'visible',
-    paddingBottom: 24,
+    paddingTop: 20,
+    paddingBottom: 20,
   },
   bg: {
     position: 'absolute',

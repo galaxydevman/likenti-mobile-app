@@ -4,6 +4,8 @@ export type ProductDetailProduct = {
   id: string;
   title: string;
   imageUrl: string;
+  /** Extra gallery images from Shopify; detail screen falls back to [imageUrl] when absent */
+  imageUrls?: string[];
   saveLabel: string;
   oldPrice: string;
   newPrice: string;

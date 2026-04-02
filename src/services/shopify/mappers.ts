@@ -29,6 +29,23 @@ function parseCollectionHandleFromUrl(rawUrl?: string | null): string | null {
   return match?.[1]?.trim() ?? null;
 }
 
+function collectProductImageUrls(node: ShopifyProductNode): string[] {
+  const placeholder = 'https://via.placeholder.com/600x600?text=No+Image';
+  const featured = node.featuredImage?.url?.trim();
+  const fromGallery = (node.images?.nodes ?? []).map((n) => n.url?.trim()).filter(Boolean) as string[];
+  const ordered: string[] = [];
+  const seen = new Set<string>();
+  const push = (u: string) => {
+    if (!u || seen.has(u)) return;
+    seen.add(u);
+    ordered.push(u);
+  };
+  if (featured) push(featured);
+  for (const u of fromGallery) push(u);
+  if (ordered.length === 0) push(placeholder);
+  return ordered;
+}
+
 export function toProductDetailProduct(node: ShopifyProductNode): ProductDetailProduct {
   const current = node.priceRange.minVariantPrice;
   const compareAt =
@@ -41,10 +58,13 @@ export function toProductDetailProduct(node: ShopifyProductNode): ProductDetailP
   const savingPct =
     compareValue > currentValue ? Math.round(((compareValue - currentValue) / compareValue) * 100) : 0;
 
+  const imageUrls = collectProductImageUrls(node);
+
   return {
     id: node.id,
     title: node.title,
-    imageUrl: node.featuredImage?.url ?? 'https://via.placeholder.com/600x600?text=No+Image',
+    imageUrl: imageUrls[0] ?? 'https://via.placeholder.com/600x600?text=No+Image',
+    imageUrls: imageUrls.length > 1 ? imageUrls : undefined,
     saveLabel: savingPct > 0 ? `Save ${savingPct}%` : 'Best price',
     oldPrice: formatMoney(compareAt),
     newPrice: formatMoney(current),
