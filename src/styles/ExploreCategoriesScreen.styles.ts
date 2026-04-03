@@ -17,11 +17,11 @@ export const styles = StyleSheet.create({
   card: {
     flex: 1,
     alignSelf: 'stretch',
-    borderRadius: 6,
+    borderRadius: 12,
     overflow: 'hidden',
     backgroundColor: colors.white,
     borderWidth: 1,
-    borderColor: 'rgba(15, 23, 42, 0.2)',
+    borderColor: 'rgba(15, 23, 42, 0.02)',
     marginBottom: 5,
     marginTop: 5,
   },
