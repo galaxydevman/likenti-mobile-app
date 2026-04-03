@@ -24,6 +24,7 @@ export type HomeStackParamList = {
   Search: undefined;
   ExploreCategories: undefined;
   ProductList: { categoryId: string; categoryTitle: string };
+  ProductDetail: { product: ProductDetailProduct };
 };
 
 export type RootTabParamList = {
@@ -34,24 +35,14 @@ export type RootTabParamList = {
   More: undefined;
 };
 
-export type RootStackParamList = {
-  Tabs: NavigatorScreenParams<RootTabParamList> | undefined;
-  ProductDetail: { product: ProductDetailProduct };
-};
-
-type HomeTabAndRootStackProps = CompositeScreenProps<
-  BottomTabScreenProps<RootTabParamList, 'Home'>,
-  NativeStackScreenProps<RootStackParamList>
->;
-
-/** Navigation from the home feed: same stack (Search, categories, lists) + root (ProductDetail) via parent. */
+/** Navigation from the home feed: home stack (Search, categories, lists, product detail) + sibling tabs via parent. */
 export type HomeScreenNavigationProp = CompositeNavigationProp<
   NativeStackNavigationProp<HomeStackParamList, 'Home'>,
-  HomeTabAndRootStackProps['navigation']
+  BottomTabNavigationProp<RootTabParamList>
 >;
 
-/** Any screen pushed on the home stack (search, categories, product list): can open product detail on root. */
+/** Any screen pushed on the home stack: can open product detail in the same stack (tab bar stays visible). */
 export type HomeStackChildScreenProps<RouteName extends keyof HomeStackParamList> = CompositeScreenProps<
   NativeStackScreenProps<HomeStackParamList, RouteName>,
-  HomeTabAndRootStackProps
+  BottomTabScreenProps<RootTabParamList, 'Home'>
 >;

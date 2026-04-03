@@ -12,10 +12,9 @@ import ProductListScreen from '../screens/ProductListScreen';
 import ExploreCategoriesScreen from '../screens/ExploreCategoriesScreen';
 import { colors } from '../theme/colors';
 import { useCart } from '../context/CartContext';
-import type { HomeStackParamList, RootStackParamList, RootTabParamList } from './types';
+import type { HomeStackParamList, RootTabParamList } from './types';
 
 const Tab = createBottomTabNavigator<RootTabParamList>();
-const Stack = createNativeStackNavigator<RootStackParamList>();
 const HomeStack = createNativeStackNavigator<HomeStackParamList>();
 const HOME_LOGO = require('../../assets/icon/likenti_logo_transparent_white.png');
 
@@ -62,6 +61,11 @@ function HomeStackNavigator() {
         name="ProductList"
         component={ProductListScreen}
         options={({ route }) => ({ title: route.params.categoryTitle, headerBackTitle: 'Back' })}
+      />
+      <HomeStack.Screen
+        name="ProductDetail"
+        component={ProductDetailScreen}
+        options={{ title: 'Product details', headerBackTitle: 'Back' }}
       />
     </HomeStack.Navigator>
   );
@@ -137,14 +141,5 @@ function TabsNavigator() {
 }
 
 export default function RootNavigator() {
-  return (
-    <Stack.Navigator>
-      <Stack.Screen name="Tabs" component={TabsNavigator} options={{ headerShown: false }} />
-      <Stack.Screen
-        name="ProductDetail"
-        component={ProductDetailScreen}
-        options={{ title: 'Product details', headerBackTitle: 'Back' }}
-      />
-    </Stack.Navigator>
-  );
+  return <TabsNavigator />;
 }

@@ -150,21 +150,9 @@ export const styles = StyleSheet.create({
     backgroundColor: colors.white,
     paddingHorizontal: 16,
     paddingTop: 12,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-  },
-  totalLabel: {
-    color: '#64748B',
-    fontSize: 12,
-  },
-  totalValue: {
-    color: colors.textDark,
-    fontSize: 20,
-    fontWeight: '900',
   },
   addBtn: {
-    flex: 1,
+    alignSelf: 'stretch',
     height: 46,
     borderRadius: 999,
     alignItems: 'center',
@@ -175,18 +163,5 @@ export const styles = StyleSheet.create({
     color: colors.white,
     fontWeight: '800',
     fontSize: 16,
-  },
-  viewCartBtn: {
-    height: 46,
-    borderRadius: 999,
-    paddingHorizontal: 16,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: colors.headerBlue,
-  },
-  viewCartText: {
-    color: colors.headerBlue,
-    fontWeight: '700',
   },
 });

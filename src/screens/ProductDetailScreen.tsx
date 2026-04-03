@@ -14,13 +14,13 @@ import { Image } from 'expo-image';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import type { RootStackParamList } from '../navigation/types';
+import type { HomeStackParamList } from '../navigation/types';
 import { colors } from '../theme/colors';
 import { useTheme } from '../theme/ThemeContext';
 import { useCart } from '../context/CartContext';
 import { styles } from '../styles/ProductDetailScreen.styles';
 
-type Props = NativeStackScreenProps<RootStackParamList, 'ProductDetail'>;
+type Props = NativeStackScreenProps<HomeStackParamList, 'ProductDetail'>;
 
 function parsePrice(priceText: string): number {
   return Number.parseFloat(priceText.replace(/[^0-9.]/g, '')) || 0;
@@ -32,7 +32,7 @@ function formatCurrency(value: number): string {
 
 const CONTENT_H_PAD = 16;
 
-export default function ProductDetailScreen({ route, navigation }: Props) {
+export default function ProductDetailScreen({ route }: Props) {
   const insets = useSafeAreaInsets();
   const { width: windowWidth } = useWindowDimensions();
   const slideWidth = windowWidth - CONTENT_H_PAD * 2;
@@ -80,7 +80,6 @@ export default function ProductDetailScreen({ route, navigation }: Props) {
 
   const unitPrice = useMemo(() => parsePrice(product.newPrice), [product.newPrice]);
   const compareAtPrice = useMemo(() => parsePrice(product.oldPrice), [product.oldPrice]);
-  const total = unitPrice * quantity;
 
   const onAddToCart = () => {
     addItem({
@@ -101,7 +100,7 @@ export default function ProductDetailScreen({ route, navigation }: Props) {
       <ScrollView
         nestedScrollEnabled
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={[styles.content, { paddingBottom: 140 + insets.bottom }]}
+        contentContainerStyle={[styles.content, { paddingBottom: 100 + insets.bottom }]}
       >
         <View style={styles.galleryWrap}>
           <FlatList
@@ -178,15 +177,8 @@ export default function ProductDetailScreen({ route, navigation }: Props) {
       </ScrollView>
 
       <View style={[styles.footer, { paddingBottom: Math.max(12, insets.bottom) }]}>
-        <View>
-          <Text style={styles.totalLabel}>Total</Text>
-          <Text style={styles.totalValue}>{formatCurrency(total)}</Text>
-        </View>
         <Pressable style={styles.addBtn} onPress={onAddToCart}>
           <Text style={styles.addBtnText}>Add to cart</Text>
-        </Pressable>
-        <Pressable style={styles.viewCartBtn} onPress={() => navigation.navigate('Tabs', { screen: 'Cart' })}>
-          <Text style={styles.viewCartText}>Cart</Text>
         </Pressable>
       </View>
     </View>

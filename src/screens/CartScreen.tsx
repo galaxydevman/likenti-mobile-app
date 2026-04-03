@@ -10,48 +10,26 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useNavigation, type NavigationProp, type ParamListBase } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useCart } from '../context/CartContext';
 import { colors } from '../theme/colors';
 import { cartColors, styles } from '../styles/CartScreen.styles';
-import type { RootStackParamList, RootTabParamList } from '../navigation/types';
+import type { RootTabParamList } from '../navigation/types';
 
 function formatCurrency(value: number): string {
   return `$${value.toFixed(2)}`;
 }
 
-/** Switch to Home tab and root home stack screen (Cart lives under tabs inside root stack). */
-function navigateToMainHome(
-  navigation: NavigationProp<ParamListBase>
-) {
-  let current: NavigationProp<ParamListBase> | undefined = navigation;
-  for (let i = 0; i < 6 && current; i += 1) {
-    const names = current.getState()?.routeNames as string[] | undefined;
-    if (names?.includes('Home') && names?.includes('Cart')) {
-      (current as BottomTabNavigationProp<RootTabParamList>).navigate('Home', { screen: 'Home' });
-      return;
-    }
-    current = current.getParent();
-  }
-  current = navigation;
-  for (let i = 0; i < 6 && current; i += 1) {
-    const names = current.getState()?.routeNames as string[] | undefined;
-    if (names?.includes('Tabs')) {
-      (current as NavigationProp<RootStackParamList>).navigate('Tabs', {
-        screen: 'Home',
-        params: { screen: 'Home' },
-      });
-      return;
-    }
-    current = current.getParent();
-  }
+/** Switch to Home tab and reset its stack to the home feed. */
+function navigateToMainHome(navigation: BottomTabNavigationProp<RootTabParamList>) {
+  navigation.navigate('Home', { screen: 'Home' });
 }
 
 export default function CartScreen() {
   const insets = useSafeAreaInsets();
-  const navigation = useNavigation();
+  const navigation = useNavigation<BottomTabNavigationProp<RootTabParamList>>();
   const { items, subtotal, updateQuantity, removeItem } = useCart();
 
   const [orderNote, setOrderNote] = useState('');
