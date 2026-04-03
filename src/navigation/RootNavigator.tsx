@@ -12,10 +12,11 @@ import ProductListScreen from '../screens/ProductListScreen';
 import ExploreCategoriesScreen from '../screens/ExploreCategoriesScreen';
 import { colors } from '../theme/colors';
 import { useCart } from '../context/CartContext';
-import type { RootStackParamList, RootTabParamList } from './types';
+import type { HomeStackParamList, RootStackParamList, RootTabParamList } from './types';
 
 const Tab = createBottomTabNavigator<RootTabParamList>();
 const Stack = createNativeStackNavigator<RootStackParamList>();
+const HomeStack = createNativeStackNavigator<HomeStackParamList>();
 const HOME_LOGO = require('../../assets/icon/likenti_logo_transparent_white.png');
 
 function NuhdeekTab() {
@@ -26,6 +27,44 @@ function AccountTab() {
 }
 function MoreTab() {
   return <PlaceholderScreen title="More" />;
+}
+
+function HomeStackNavigator() {
+  return (
+    <HomeStack.Navigator>
+      <HomeStack.Screen name="Home" component={HomeScreen} options={{ headerShown: false }} />
+      <HomeStack.Screen
+        name="Search"
+        component={SearchScreen}
+        options={{ title: '', headerBackTitle: 'Back', headerTitleAlign: 'left' }}
+      />
+      <HomeStack.Screen
+        name="ExploreCategories"
+        component={ExploreCategoriesScreen}
+        options={({ navigation }) => ({
+          title: 'Explore Categories',
+          headerTitleAlign: 'center',
+          headerBackTitle: 'Back',
+          headerRight: () => (
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel="Search"
+              onPress={() => navigation.navigate('Search')}
+              hitSlop={12}
+              style={{ marginRight: 4 }}
+            >
+              <Ionicons name="search-outline" size={24} color={colors.textDark} />
+            </Pressable>
+          ),
+        })}
+      />
+      <HomeStack.Screen
+        name="ProductList"
+        component={ProductListScreen}
+        options={({ route }) => ({ title: route.params.categoryTitle, headerBackTitle: 'Back' })}
+      />
+    </HomeStack.Navigator>
+  );
 }
 
 function TabsNavigator() {
@@ -68,7 +107,7 @@ function TabsNavigator() {
       />
       <Tab.Screen
         name="Home"
-        component={HomeScreen}
+        component={HomeStackNavigator}
         options={{
           tabBarIcon: ({ color, size }) => (
             <Image
@@ -105,36 +144,6 @@ export default function RootNavigator() {
         name="ProductDetail"
         component={ProductDetailScreen}
         options={{ title: 'Product details', headerBackTitle: 'Back' }}
-      />
-      <Stack.Screen
-        name="Search"
-        component={SearchScreen}
-        options={{ title: '', headerBackTitle: 'Back', headerTitleAlign: 'left' }}
-      />
-      <Stack.Screen
-        name="ExploreCategories"
-        component={ExploreCategoriesScreen}
-        options={({ navigation }) => ({
-          title: 'Explore Categories',
-          headerTitleAlign: 'center',
-          headerBackTitle: 'Back',
-          headerRight: () => (
-            <Pressable
-              accessibilityRole="button"
-              accessibilityLabel="Search"
-              onPress={() => navigation.navigate('Search')}
-              hitSlop={12}
-              style={{ marginRight: 4 }}
-            >
-              <Ionicons name="search-outline" size={24} color={colors.textDark} />
-            </Pressable>
-          ),
-        })}
-      />
-      <Stack.Screen
-        name="ProductList"
-        component={ProductListScreen}
-        options={({ route }) => ({ title: route.params.categoryTitle, headerBackTitle: 'Back' })}
       />
     </Stack.Navigator>
   );

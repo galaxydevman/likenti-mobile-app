@@ -1,15 +1,14 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator, FlatList, Pressable, Text, View } from 'react-native';
 import { Image } from 'expo-image';
-import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { colors } from '../theme/colors';
 import { useTheme } from '../theme/ThemeContext';
 import { useCart } from '../context/CartContext';
-import type { ProductDetailProduct, RootStackParamList } from '../navigation/types';
+import type { HomeStackChildScreenProps, ProductDetailProduct } from '../navigation/types';
 import { fetchStorefrontProducts } from '../services/shopify';
 import { styles } from '../styles/ProductListScreen.styles';
 
-type Props = NativeStackScreenProps<RootStackParamList, 'ProductList'>;
+type Props = HomeStackChildScreenProps<'ProductList'>;
 
 function parsePrice(priceText: string): number {
   return Number.parseFloat(priceText.replace(/[^0-9.]/g, '')) || 0;

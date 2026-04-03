@@ -9,13 +9,12 @@ import {
   View,
 } from 'react-native';
 import { Image } from 'expo-image';
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useFocusEffect } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../theme/colors';
 import { useTheme } from '../theme/ThemeContext';
 import { HomeSearchBar } from '../components/home/HomeSearchBar';
-import type { RootStackParamList, ProductDetailProduct } from '../navigation/types';
+import type { HomeStackChildScreenProps, ProductDetailProduct } from '../navigation/types';
 import { fetchStorefrontProductSearch } from '../services/shopify';
 import { useCart } from '../context/CartContext';
 import { styles } from '../styles/SearchScreen.styles';
@@ -97,7 +96,7 @@ const TRENDING_CATEGORIES = [
 const SEARCH_DEBOUNCE_MS = 400;
 const MIN_QUERY_LENGTH = 2;
 
-type Props = NativeStackScreenProps<RootStackParamList, 'Search'>;
+type Props = HomeStackChildScreenProps<'Search'>;
 
 function parsePrice(priceText: string): number {
   return Number.parseFloat(priceText.replace(/[^0-9.]/g, '')) || 0;

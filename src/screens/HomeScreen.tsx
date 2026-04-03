@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Animated, Linking, StatusBar as RNStatusBar, View } from 'react-native';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
-import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { HomeHeader } from '../components/home/HomeHeader';
 import { AnnouncementBar } from '../components/home/AnnouncementBar';
 import { HeroCarousel, type HeroSlide } from '../components/home/HeroCarousel';
@@ -10,7 +9,7 @@ import { ShopifyGridImageSlider, type ShopifyGridImageSlide } from '../component
 import { ShopByCategory, type CategoryItem } from '../components/home/ShopByCategory';
 import { TopPicksPanel, type TopPickProduct } from '../components/home/TopPicksPanel';
 import { useCart } from '../context/CartContext';
-import type { RootStackParamList } from '../navigation/types';
+import type { HomeScreenNavigationProp } from '../navigation/types';
 import { CATALOG_PRODUCTS, PRODUCT_CATEGORIES } from '../data/productCatalog';
 import { fetchStorefrontHeroBanners, fetchStorefrontMainMenuCategories } from '../services/shopify';
 import { styles } from '../styles/HomeScreen.styles';
@@ -78,7 +77,7 @@ export default function HomeScreen() {
   const scrollY = useRef(new Animated.Value(0)).current;
   const { addItem } = useCart();
   const { headerTheme } = useTheme();
-  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const navigation = useNavigation<HomeScreenNavigationProp>();
   const headerBleedColor = headerTheme.gradientColors?.[0] ?? headerTheme.backgroundColor ?? '#1a2744';
   const [menuCategories, setMenuCategories] = useState<CategoryItem[] | null>(null);
   const [heroSlides, setHeroSlides] = useState<HeroSlide[] | null>(null);

@@ -10,16 +10,20 @@ export const styles = StyleSheet.create({
     paddingBottom: 28,
   },
   row: {
+    alignItems: 'stretch',
     gap: 10,
     marginBottom: 10,
   },
   card: {
     flex: 1,
+    alignSelf: 'stretch',
     borderRadius: 12,
     overflow: 'hidden',
     backgroundColor: colors.white,
     borderWidth: 1,
-    borderColor: 'rgba(15, 23, 42, 0.06)',
+    borderColor: 'rgba(15, 23, 42, 0.2)',
+    marginBottom: 5,
+    marginTop: 5,
   },
   imageWrap: {
     width: '100%',
@@ -36,11 +40,13 @@ export const styles = StyleSheet.create({
     justifyContent: 'center',
     backgroundColor: colors.categoryCircleBg,
   },
+  /** Fixed height so every card matches regardless of 1 vs 2 title lines (2× lineHeight + vertical padding). */
   labelWrap: {
-    paddingVertical: 10,
+    height: 52,
     paddingHorizontal: 6,
-    minHeight: 44,
+    paddingVertical: 8,
     justifyContent: 'center',
+    overflow: 'hidden',
   },
   label: {
     textAlign: 'center',

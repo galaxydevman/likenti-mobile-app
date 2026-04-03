@@ -1,4 +1,10 @@
-import type { NavigatorScreenParams } from '@react-navigation/native';
+import type {
+  CompositeNavigationProp,
+  CompositeScreenProps,
+  NavigatorScreenParams,
+} from '@react-navigation/native';
+import type { BottomTabNavigationProp, BottomTabScreenProps } from '@react-navigation/bottom-tabs';
+import type { NativeStackNavigationProp, NativeStackScreenProps } from '@react-navigation/native-stack';
 
 export type ProductDetailProduct = {
   id: string;
@@ -13,9 +19,16 @@ export type ProductDetailProduct = {
   rating: number;
 };
 
+export type HomeStackParamList = {
+  Home: undefined;
+  Search: undefined;
+  ExploreCategories: undefined;
+  ProductList: { categoryId: string; categoryTitle: string };
+};
+
 export type RootTabParamList = {
   Nuhdeek: undefined;
-  Home: undefined;
+  Home: NavigatorScreenParams<HomeStackParamList> | undefined;
   Cart: undefined;
   Account: undefined;
   More: undefined;
@@ -24,7 +37,21 @@ export type RootTabParamList = {
 export type RootStackParamList = {
   Tabs: NavigatorScreenParams<RootTabParamList> | undefined;
   ProductDetail: { product: ProductDetailProduct };
-  Search: undefined;
-  ExploreCategories: undefined;
-  ProductList: { categoryId: string; categoryTitle: string };
 };
+
+type HomeTabAndRootStackProps = CompositeScreenProps<
+  BottomTabScreenProps<RootTabParamList, 'Home'>,
+  NativeStackScreenProps<RootStackParamList>
+>;
+
+/** Navigation from the home feed: same stack (Search, categories, lists) + root (ProductDetail) via parent. */
+export type HomeScreenNavigationProp = CompositeNavigationProp<
+  NativeStackNavigationProp<HomeStackParamList, 'Home'>,
+  HomeTabAndRootStackProps['navigation']
+>;
+
+/** Any screen pushed on the home stack (search, categories, product list): can open product detail on root. */
+export type HomeStackChildScreenProps<RouteName extends keyof HomeStackParamList> = CompositeScreenProps<
+  NativeStackScreenProps<HomeStackParamList, RouteName>,
+  HomeTabAndRootStackProps
+>;

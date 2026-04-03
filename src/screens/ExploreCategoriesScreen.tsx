@@ -2,15 +2,14 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator, FlatList, Pressable, Text, View } from 'react-native';
 import { Image } from 'expo-image';
 import { Ionicons } from '@expo/vector-icons';
-import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { PRODUCT_CATEGORIES } from '../data/productCatalog';
-import type { RootStackParamList } from '../navigation/types';
+import type { HomeStackChildScreenProps } from '../navigation/types';
 import { fetchStorefrontMainMenuCategories, type StorefrontMenuCategory } from '../services/shopify';
 import { colors } from '../theme/colors';
 import { useTheme } from '../theme/ThemeContext';
 import { styles } from '../styles/ExploreCategoriesScreen.styles';
 
-type Props = NativeStackScreenProps<RootStackParamList, 'ExploreCategories'>;
+type Props = HomeStackChildScreenProps<'ExploreCategories'>;
 
 const FALLBACK: StorefrontMenuCategory[] = PRODUCT_CATEGORIES.filter((c) => c.id !== 'all').map(
   (c) => ({ id: c.id, title: c.title, imageUrl: c.imageUrl })
