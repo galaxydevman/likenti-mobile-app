@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Animated, Linking, StatusBar as RNStatusBar, View } from 'react-native';
+import { ActivityIndicator, Animated, Linking, StatusBar as RNStatusBar, Text, View } from 'react-native';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { HomeHeader } from '../components/home/HomeHeader';
 import { AnnouncementBar } from '../components/home/AnnouncementBar';
@@ -13,6 +13,7 @@ import type { HomeScreenNavigationProp } from '../navigation/types';
 import { CATALOG_PRODUCTS, PRODUCT_CATEGORIES } from '../data/productCatalog';
 import { fetchStorefrontHeroBanners, fetchStorefrontMainMenuCategories } from '../services/shopify';
 import { styles } from '../styles/HomeScreen.styles';
+import { colors } from '../theme/colors';
 import { useTheme } from '../theme/ThemeContext';
 
 /** Placeholder imagery; replace with Storefront API (collections, metaobjects, files). */
@@ -81,12 +82,14 @@ export default function HomeScreen() {
   const headerBleedColor = headerTheme.gradientColors?.[0] ?? headerTheme.backgroundColor ?? '#1a2744';
   const [menuCategories, setMenuCategories] = useState<CategoryItem[] | null>(null);
   const [heroSlides, setHeroSlides] = useState<HeroSlide[] | null>(null);
+  const [storefrontLoading, setStorefrontLoading] = useState(true);
 
   const parsePrice = (priceText: string) =>
     Number.parseFloat(priceText.replace(/[^0-9.]/g, '')) || 0;
 
   useEffect(() => {
     let alive = true;
+
     const loadMenuCategories = async () => {
       try {
         const items = await fetchStorefrontMainMenuCategories();
@@ -108,14 +111,7 @@ export default function HomeScreen() {
         }
       }
     };
-    void loadMenuCategories();
-    return () => {
-      alive = false;
-    };
-  }, []);
 
-  useEffect(() => {
-    let alive = true;
     const loadHeroBanners = async () => {
       try {
         const banners = await fetchStorefrontHeroBanners();
@@ -148,7 +144,15 @@ export default function HomeScreen() {
         }
       }
     };
-    void loadHeroBanners();
+
+    const load = async () => {
+      await Promise.all([loadMenuCategories(), loadHeroBanners()]);
+      if (alive) {
+        setStorefrontLoading(false);
+      }
+    };
+
+    void load();
     return () => {
       alive = false;
     };
@@ -181,6 +185,15 @@ export default function HomeScreen() {
       return () => RNStatusBar.setBarStyle('dark-content');
     }, [headerTheme.statusBarStyle])
   );
+
+  if (storefrontLoading) {
+    return (
+      <View style={[styles.root, styles.loadingScreen, { backgroundColor: headerTheme.pageBackground }]}>
+        <ActivityIndicator size="large" color={colors.headerBlue} />
+        <Text style={styles.loadingText}>Loading store…</Text>
+      </View>
+    );
+  }
 
   return (
     <Animated.ScrollView
