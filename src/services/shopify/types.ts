@@ -11,6 +11,7 @@ export type MoneyV2 = {
 export type ShopifyProductNode = {
   id: string;
   title: string;
+  description?: string;
   productType: string;
   featuredImage: { url: string } | null;
   images: {

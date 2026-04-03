@@ -12,11 +12,15 @@ export type ProductDetailProduct = {
   imageUrl: string;
   /** Extra gallery images from Shopify; detail screen falls back to [imageUrl] when absent */
   imageUrls?: string[];
+  /** Plain text from Shopify `description` or catalog */
+  description?: string;
   saveLabel: string;
   oldPrice: string;
   newPrice: string;
   badgeLabel: string;
   rating: number;
+  /** When set (e.g. Shopify), shown in the reviews header */
+  reviewCount?: number;
 };
 
 export type HomeStackParamList = {

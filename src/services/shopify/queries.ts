@@ -4,6 +4,7 @@ export const PRODUCTS_QUERY = `
       nodes {
         id
         title
+        description
         productType
         featuredImage {
           url
@@ -48,6 +49,7 @@ export const PRODUCT_SEARCH_QUERY = `
       nodes {
         id
         title
+        description
         productType
         featuredImage {
           url
@@ -93,6 +95,7 @@ export const COLLECTION_PRODUCTS_QUERY = `
         nodes {
           id
           title
+          description
           productType
           featuredImage {
             url

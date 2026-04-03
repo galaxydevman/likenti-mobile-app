@@ -59,12 +59,14 @@ export function toProductDetailProduct(node: ShopifyProductNode): ProductDetailP
     compareValue > currentValue ? Math.round(((compareValue - currentValue) / compareValue) * 100) : 0;
 
   const imageUrls = collectProductImageUrls(node);
+  const description = node.description?.trim();
 
   return {
     id: node.id,
     title: node.title,
     imageUrl: imageUrls[0] ?? 'https://via.placeholder.com/600x600?text=No+Image',
     imageUrls: imageUrls.length > 1 ? imageUrls : undefined,
+    ...(description ? { description } : {}),
     saveLabel: savingPct > 0 ? `Save ${savingPct}%` : 'Best price',
     oldPrice: formatMoney(compareAt),
     newPrice: formatMoney(current),
