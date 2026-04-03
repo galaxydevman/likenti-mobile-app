@@ -1,7 +1,10 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   Alert,
+  Animated,
+  Easing,
   FlatList,
+  LayoutChangeEvent,
   Modal,
   NativeScrollEvent,
   NativeSyntheticEvent,
@@ -51,6 +54,10 @@ function formatCurrency(value: number): string {
 }
 
 const CONTENT_H_PAD = 16;
+
+const DESCRIPTION_ANIM_MS = 300;
+
+const descriptionEase = Easing.bezier(0.25, 0.1, 0.25, 1);
 
 const DESCRIPTION_FALLBACK = 'No detailed description is available for this product yet.';
 
@@ -116,6 +123,9 @@ export default function ProductDetailScreen({ route, navigation }: Props) {
   const [viewerIndex, setViewerIndex] = useState(0);
   const [viewerMountKey, setViewerMountKey] = useState(0);
   const [descriptionExpanded, setDescriptionExpanded] = useState(false);
+  const [descriptionContentHeight, setDescriptionContentHeight] = useState(0);
+  const descriptionHeightAnim = useRef(new Animated.Value(0)).current;
+  const descriptionChevronAnim = useRef(new Animated.Value(0)).current;
   const galleryListRef = useRef<FlatList<string>>(null);
 
   const imageGallery = useMemo(
@@ -130,7 +140,66 @@ export default function ProductDetailScreen({ route, navigation }: Props) {
 
   useEffect(() => {
     setDescriptionExpanded(false);
-  }, [product.id]);
+    setDescriptionContentHeight(0);
+    descriptionHeightAnim.setValue(0);
+    descriptionChevronAnim.setValue(0);
+  }, [product.id, descriptionHeightAnim, descriptionChevronAnim]);
+
+  const onDescriptionContentLayout = useCallback((e: LayoutChangeEvent) => {
+    const h = Math.ceil(e.nativeEvent.layout.height);
+    if (h > 0) setDescriptionContentHeight((prev) => (prev === h ? prev : h));
+  }, []);
+
+  useEffect(() => {
+    if (!descriptionExpanded || descriptionContentHeight <= 0) return;
+
+    descriptionHeightAnim.stopAnimation();
+    descriptionHeightAnim.setValue(0);
+
+    Animated.parallel([
+      Animated.timing(descriptionHeightAnim, {
+        toValue: descriptionContentHeight,
+        duration: DESCRIPTION_ANIM_MS,
+        easing: descriptionEase,
+        useNativeDriver: false,
+      }),
+      Animated.timing(descriptionChevronAnim, {
+        toValue: 1,
+        duration: DESCRIPTION_ANIM_MS,
+        easing: descriptionEase,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, [descriptionExpanded, descriptionContentHeight, descriptionHeightAnim, descriptionChevronAnim]);
+
+  const toggleDescriptionExpanded = useCallback(() => {
+    if (descriptionExpanded) {
+      descriptionHeightAnim.stopAnimation();
+      descriptionChevronAnim.stopAnimation();
+      Animated.parallel([
+        Animated.timing(descriptionHeightAnim, {
+          toValue: 0,
+          duration: DESCRIPTION_ANIM_MS,
+          easing: descriptionEase,
+          useNativeDriver: false,
+        }),
+        Animated.timing(descriptionChevronAnim, {
+          toValue: 0,
+          duration: DESCRIPTION_ANIM_MS,
+          easing: descriptionEase,
+          useNativeDriver: true,
+        }),
+      ]).start(({ finished }) => {
+        if (finished) setDescriptionExpanded(false);
+      });
+    } else {
+      descriptionHeightAnim.stopAnimation();
+      descriptionChevronAnim.stopAnimation();
+      descriptionChevronAnim.setValue(0);
+      descriptionHeightAnim.setValue(0);
+      setDescriptionExpanded(true);
+    }
+  }, [descriptionExpanded, descriptionHeightAnim, descriptionChevronAnim]);
 
   useEffect(() => {
     if (imageGallery.length == 1) return;
@@ -174,6 +243,15 @@ export default function ProductDetailScreen({ route, navigation }: Props) {
   }, [product.description]);
 
   const descriptionBullets = useMemo(() => descriptionToBullets(aboutText), [aboutText]);
+
+  const descriptionChevronRotation = useMemo(
+    () =>
+      descriptionChevronAnim.interpolate({
+        inputRange: [0, 1],
+        outputRange: ['0deg', '180deg'],
+      }),
+    [descriptionChevronAnim],
+  );
 
   const reviewTotalDisplay = useMemo(() => {
     if (product.reviewCount != null && product.reviewCount > 0) return product.reviewCount;
@@ -352,7 +430,7 @@ export default function ProductDetailScreen({ route, navigation }: Props) {
                 descriptionExpanded && styles.descriptionAccordionHeaderExpanded,
                 pressed && { opacity: 0.92 },
               ]}
-              onPress={() => setDescriptionExpanded((v) => !v)}
+              onPress={toggleDescriptionExpanded}
               accessibilityRole="button"
               accessibilityState={{ expanded: descriptionExpanded }}
               accessibilityLabel="Product description"
@@ -361,18 +439,26 @@ export default function ProductDetailScreen({ route, navigation }: Props) {
               }
             >
               <Text style={styles.descriptionAccordionLabel}>Product Description</Text>
-              <Ionicons
-                name="chevron-down"
-                size={22}
-                color={colors.headerBlue}
-                style={[
-                  styles.descriptionAccordionChevron,
-                  { transform: [{ rotate: descriptionExpanded ? '180deg' : '0deg' }] },
-                ]}
-              />
+              <Animated.View
+                style={[styles.descriptionAccordionChevron, { transform: [{ rotate: descriptionChevronRotation }] }]}
+              >
+                <Ionicons name="chevron-down" size={22} color={colors.headerBlue} />
+              </Animated.View>
             </Pressable>
-            {descriptionExpanded ? (
-              <View style={styles.descriptionAccordionExpanded}>
+            <Animated.View
+              style={{
+                height: descriptionHeightAnim,
+                overflow: 'hidden',
+              }}
+              pointerEvents={descriptionExpanded ? 'auto' : 'none'}
+            >
+              <View
+                style={[
+                  styles.descriptionAccordionExpanded,
+                  { position: 'absolute', left: 0, right: 0, top: 0 },
+                ]}
+                onLayout={onDescriptionContentLayout}
+              >
                 <Text style={styles.descriptionBlockTitle}>Product Description:</Text>
                 {descriptionBullets.map((line, idx) => (
                   <View
@@ -387,7 +473,7 @@ export default function ProductDetailScreen({ route, navigation }: Props) {
                   </View>
                 ))}
               </View>
-            ) : null}
+            </Animated.View>
           </View>
         </View>
 

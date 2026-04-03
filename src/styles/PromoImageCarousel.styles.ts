@@ -14,12 +14,12 @@ export const styles = StyleSheet.create({
   slide: {
     width: SLIDE_W,
     position: 'relative',
-    borderRadius: 20,
+    borderRadius: 6,
     overflow: 'hidden',
   },
   slideImage: {
     width: '100%',
-    borderRadius: 20,
+    borderRadius: 6,
   },
   dotStrip: {
     position: 'absolute',

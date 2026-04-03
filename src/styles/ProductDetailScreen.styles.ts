@@ -11,7 +11,7 @@ export const styles = StyleSheet.create({
   },
   galleryWrap: {
     marginBottom: 14,
-    borderRadius: 20,
+    borderRadius: 6,
     overflow: 'hidden',
     backgroundColor: colors.white,
   },
@@ -90,7 +90,7 @@ export const styles = StyleSheet.create({
   },
   card: {
     backgroundColor: colors.white,
-    borderRadius: 18,
+    borderRadius: 6,
     borderWidth: 1,
     borderColor: 'rgba(15,23,42,0.08)',
     padding: 14,
@@ -107,7 +107,7 @@ export const styles = StyleSheet.create({
   },
   badgePill: {
     backgroundColor: '#2FB47C',
-    borderRadius: 999,
+    borderRadius: 6,
     paddingHorizontal: 10,
     paddingVertical: 4,
   },
@@ -127,7 +127,7 @@ export const styles = StyleSheet.create({
     marginTop: 12,
     alignSelf: 'flex-start',
     backgroundColor: '#E11D48',
-    borderRadius: 999,
+    borderRadius: 6,
     paddingHorizontal: 10,
     paddingVertical: 6,
     flexDirection: 'row',
@@ -171,7 +171,7 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     borderWidth: 1,
     borderColor: '#D8E0EB',
-    borderRadius: 999,
+    borderRadius: 6,
     paddingHorizontal: 4,
     height: 36,
   },
@@ -202,7 +202,7 @@ export const styles = StyleSheet.create({
   addBtn: {
     alignSelf: 'stretch',
     height: 46,
-    borderRadius: 999,
+    borderRadius: 8,
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: colors.headerBlue,
@@ -218,7 +218,7 @@ export const styles = StyleSheet.create({
   subsectionCard: {
     marginTop: 14,
     backgroundColor: colors.white,
-    borderRadius: 18,
+    borderRadius: 6,
     borderWidth: 1,
     borderColor: 'rgba(15,23,42,0.08)',
     padding: 14,
@@ -240,7 +240,7 @@ export const styles = StyleSheet.create({
   },
   aboutCard: {
     backgroundColor: colors.white,
-    borderRadius: 18,
+    borderRadius: 6,
     borderWidth: 1,
     borderColor: 'rgba(15,23,42,0.08)',
     overflow: 'hidden',
@@ -318,7 +318,7 @@ export const styles = StyleSheet.create({
     minWidth: 52,
     paddingVertical: 6,
     paddingHorizontal: 8,
-    borderRadius: 12,
+    borderRadius: 6,
     backgroundColor: 'rgba(36,114,169,0.1)',
   },
   reviewsAverage: {

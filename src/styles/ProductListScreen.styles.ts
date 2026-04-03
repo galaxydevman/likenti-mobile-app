@@ -44,7 +44,7 @@ export const styles = StyleSheet.create({
   },
   card: {
     flex: 1,
-    borderRadius: 16,
+    borderRadius: 6,
     overflow: 'hidden',
     backgroundColor: colors.white,
     borderWidth: 1,
@@ -82,7 +82,7 @@ export const styles = StyleSheet.create({
   },
   addBtn: {
     marginTop: 12,
-    borderRadius: 999,
+    borderRadius: 6,
     height: 38,
     alignItems: 'center',
     justifyContent: 'center',

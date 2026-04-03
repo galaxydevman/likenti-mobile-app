@@ -4,7 +4,7 @@ import { colors } from '../theme/colors';
 export const styles = StyleSheet.create({
   card: {
     backgroundColor: colors.white,
-    borderRadius: 20,
+    borderRadius: 6,
     borderWidth: 1,
     borderColor: 'rgba(15, 23, 42, 0.08)',
     paddingHorizontal: 14,
@@ -14,7 +14,7 @@ export const styles = StyleSheet.create({
   },
   imageArea: {
     marginTop: 0,
-    borderRadius: 18,
+    borderRadius: 6,
     backgroundColor: 'rgba(15, 23, 42, 0.03)',
     alignItems: 'center',
     justifyContent: 'center',
@@ -60,7 +60,7 @@ export const styles = StyleSheet.create({
     backgroundColor: '#E11D48',
     paddingHorizontal: 14,
     paddingVertical: 0,
-    borderRadius: 999,
+    borderRadius: 6,
     flexDirection: 'row',
     alignItems: 'center',
     maxWidth: '100%',
@@ -105,7 +105,7 @@ export const styles = StyleSheet.create({
   },
   badgePill: {
     backgroundColor: '#2FB47C',
-    borderRadius: 999,
+    borderRadius: 6,
     paddingHorizontal: 16,
     paddingVertical: 8,
     flexDirection: 'row',

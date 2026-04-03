@@ -18,7 +18,7 @@ export const styles = StyleSheet.create({
   card: {
     width: CARD_W,
     height: CARD_H,
-    borderRadius: 20,
+    borderRadius: 6,
     backgroundColor: colors.white,
     borderWidth: 1,
     borderColor: 'rgba(15, 23, 42, 0.08)',

@@ -17,7 +17,7 @@ export const styles = StyleSheet.create({
   card: {
     flex: 1,
     alignSelf: 'stretch',
-    borderRadius: 12,
+    borderRadius: 6,
     overflow: 'hidden',
     backgroundColor: colors.white,
     borderWidth: 1,

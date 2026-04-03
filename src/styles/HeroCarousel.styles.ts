@@ -29,7 +29,7 @@ export const styles = StyleSheet.create({
     backgroundColor: 'rgba(236, 72, 153, 0.95)',
     paddingHorizontal: 14,
     paddingVertical: 8,
-    borderRadius: 999,
+    borderRadius: 6,
     maxWidth: '70%',
   },
   brandText: {
@@ -42,7 +42,7 @@ export const styles = StyleSheet.create({
     backgroundColor: colors.white,
     paddingHorizontal: 14,
     paddingVertical: 6,
-    borderRadius: 999,
+    borderRadius: 6,
     borderWidth: 1,
     borderColor: '#ccc',
   },

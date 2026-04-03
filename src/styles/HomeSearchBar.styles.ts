@@ -38,7 +38,7 @@ export const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: colors.white,
-    borderRadius: 16,
+    borderRadius: 6,
     paddingHorizontal: 14,
     minHeight: 48,
     borderWidth: 1,
@@ -70,7 +70,7 @@ export const styles = StyleSheet.create({
   favouriteBtn: {
     width: 48,
     height: 48,
-    borderRadius: 16,
+    borderRadius: 8,
     backgroundColor: colors.white,
     alignItems: 'center',
     justifyContent: 'center',

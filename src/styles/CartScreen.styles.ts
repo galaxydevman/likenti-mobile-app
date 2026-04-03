@@ -58,7 +58,7 @@ export const styles = StyleSheet.create({
   heroArt: {
     width: 88,
     height: 88,
-    borderRadius: 12,
+    borderRadius: 6,
     backgroundColor: '#E3F2FD',
     alignItems: 'center',
     justifyContent: 'center',
@@ -95,7 +95,7 @@ export const styles = StyleSheet.create({
   lineImage: {
     width: 80,
     height: 80,
-    borderRadius: 8,
+    borderRadius: 6,
     backgroundColor: '#EEEEEE',
   },
   lineMain: {
@@ -131,7 +131,7 @@ export const styles = StyleSheet.create({
     alignSelf: 'flex-start',
     borderWidth: 1,
     borderColor: cartColors.divider,
-    borderRadius: 4,
+    borderRadius: 3,
     overflow: 'hidden',
   },
   qtyBtn: {
@@ -185,7 +185,7 @@ export const styles = StyleSheet.create({
   noteInput: {
     flex: 1,
     height: 44,
-    borderRadius: 6,
+    borderRadius: 5,
     paddingHorizontal: 12,
     backgroundColor: colors.white,
     borderWidth: StyleSheet.hairlineWidth,
@@ -196,7 +196,7 @@ export const styles = StyleSheet.create({
   noteApply: {
     height: 44,
     paddingHorizontal: 18,
-    borderRadius: 6,
+    borderRadius: 5,
     backgroundColor: cartColors.primaryGreenDark,
     alignItems: 'center',
     justifyContent: 'center',
@@ -266,7 +266,7 @@ export const styles = StyleSheet.create({
     gap: 12,
   },
   checkoutGradient: {
-    borderRadius: 10,
+    borderRadius: 6,
     overflow: 'hidden',
   },
   checkoutBtnInner: {
@@ -287,7 +287,7 @@ export const styles = StyleSheet.create({
   },
   paypalBtn: {
     height: 50,
-    borderRadius: 10,
+    borderRadius: 6,
     backgroundColor: cartColors.paypalYellow,
     alignItems: 'center',
     justifyContent: 'center',
@@ -316,7 +316,7 @@ export const styles = StyleSheet.create({
   emptyArt: {
     width: 100,
     height: 100,
-    borderRadius: 16,
+    borderRadius: 6,
     backgroundColor: '#E3F2FD',
     alignItems: 'center',
     justifyContent: 'center',
