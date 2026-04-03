@@ -161,11 +161,16 @@ export default function HomeScreen() {
       id: category.id,
       title: category.id === 'all' ? 'All Category' : category.title,
       imageUrl: category.imageUrl,
-      onPress: () =>
+      onPress: () => {
+        if (category.id === 'all') {
+          navigation.navigate('ExploreCategories');
+          return;
+        }
         navigation.navigate('ProductList', {
           categoryId: category.id,
-          categoryTitle: category.id === 'all' ? 'All Category' : category.title,
-        }),
+          categoryTitle: category.title,
+        });
+      },
     }));
   }, [menuCategories, navigation]);
 

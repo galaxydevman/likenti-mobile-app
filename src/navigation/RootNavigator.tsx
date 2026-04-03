@@ -2,13 +2,14 @@ import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
-import { Image } from 'react-native';
+import { Image, Pressable } from 'react-native';
 import HomeScreen from '../screens/HomeScreen';
 import PlaceholderScreen from '../screens/PlaceholderScreen';
 import CartScreen from '../screens/CartScreen';
 import ProductDetailScreen from '../screens/ProductDetailScreen';
 import SearchScreen from '../screens/SearchScreen';
 import ProductListScreen from '../screens/ProductListScreen';
+import ExploreCategoriesScreen from '../screens/ExploreCategoriesScreen';
 import { colors } from '../theme/colors';
 import { useCart } from '../context/CartContext';
 import type { RootStackParamList, RootTabParamList } from './types';
@@ -109,6 +110,26 @@ export default function RootNavigator() {
         name="Search"
         component={SearchScreen}
         options={{ title: '', headerBackTitle: 'Back', headerTitleAlign: 'left' }}
+      />
+      <Stack.Screen
+        name="ExploreCategories"
+        component={ExploreCategoriesScreen}
+        options={({ navigation }) => ({
+          title: 'Explore Categories',
+          headerTitleAlign: 'center',
+          headerBackTitle: 'Back',
+          headerRight: () => (
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel="Search"
+              onPress={() => navigation.navigate('Search')}
+              hitSlop={12}
+              style={{ marginRight: 4 }}
+            >
+              <Ionicons name="search-outline" size={24} color={colors.textDark} />
+            </Pressable>
+          ),
+        })}
       />
       <Stack.Screen
         name="ProductList"
