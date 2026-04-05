@@ -7,13 +7,14 @@ import { Pressable, StyleSheet, View } from 'react-native';
 import HomeScreen from '../screens/HomeScreen';
 import PlaceholderScreen from '../screens/PlaceholderScreen';
 import CartScreen from '../screens/CartScreen';
+import CheckoutWebViewScreen from '../screens/CheckoutWebViewScreen';
 import ProductDetailScreen from '../screens/ProductDetailScreen';
 import SearchScreen from '../screens/SearchScreen';
 import ProductListScreen from '../screens/ProductListScreen';
 import ExploreCategoriesScreen from '../screens/ExploreCategoriesScreen';
 import { colors } from '../theme/colors';
 import { useCart } from '../context/CartContext';
-import type { HomeStackParamList, RootTabParamList } from './types';
+import type { CartStackParamList, HomeStackParamList, RootTabParamList } from './types';
 import {
   AnimatedTabBarButton,
   AnimatedTabLabel,
@@ -24,6 +25,7 @@ import {
 
 const Tab = createBottomTabNavigator<RootTabParamList>();
 const HomeStack = createNativeStackNavigator<HomeStackParamList>();
+const CartStack = createNativeStackNavigator<CartStackParamList>();
 
 function TabBarChromeBackground() {
   return (
@@ -45,14 +47,27 @@ function TabBarChromeBackground() {
     </>
   );
 }
-function NuhdeekTab() {
-  return <PlaceholderScreen title="Nuhdeek" />;
+function LikdeekTab() {
+  return <PlaceholderScreen title="Likdeek" />;
 }
 function AccountTab() {
   return <PlaceholderScreen title="Account" />;
 }
 function MoreTab() {
   return <PlaceholderScreen title="More" />;
+}
+
+function CartStackNavigator() {
+  return (
+    <CartStack.Navigator>
+      <CartStack.Screen name="CartMain" component={CartScreen} options={{ headerShown: false }} />
+      <CartStack.Screen
+        name="CheckoutWebView"
+        component={CheckoutWebViewScreen}
+        options={{ title: 'Checkout', headerBackTitle: 'Cart' }}
+      />
+    </CartStack.Navigator>
+  );
 }
 
 function HomeStackNavigator() {
@@ -103,6 +118,7 @@ function TabsNavigator() {
 
   return (
     <Tab.Navigator
+      initialRouteName="Home"
       screenOptions={{
         headerShown: false,
         animation: 'fade',
@@ -134,8 +150,8 @@ function TabsNavigator() {
       }}
     >
       <Tab.Screen
-        name="Nuhdeek"
-        component={NuhdeekTab}
+        name="Likdeek"
+        component={LikdeekTab}
         options={{
           tabBarIcon: ({ color, size, focused }) => (
             <Ionicons name={focused ? 'gift' : 'gift-outline'} color={color} size={size} />
@@ -144,7 +160,7 @@ function TabsNavigator() {
       />
       <Tab.Screen
         name="Cart"
-        component={CartScreen}
+        component={CartStackNavigator}
         options={{
           tabBarIcon: ({ color, size, focused }) => (
             <Ionicons name={focused ? 'cart' : 'cart-outline'} color={color} size={size} />

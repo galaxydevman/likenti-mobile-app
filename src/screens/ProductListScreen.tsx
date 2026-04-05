@@ -4,15 +4,12 @@ import { Image } from 'expo-image';
 import { colors } from '../theme/colors';
 import { useTheme } from '../theme/ThemeContext';
 import { useCart } from '../context/CartContext';
+import { cartItemFromProductDetail } from '../utils/cartLineFromProduct';
 import type { HomeStackChildScreenProps, ProductDetailProduct } from '../navigation/types';
 import { fetchStorefrontProducts } from '../services/shopify';
 import { styles } from '../styles/ProductListScreen.styles';
 
 type Props = HomeStackChildScreenProps<'ProductList'>;
-
-function parsePrice(priceText: string): number {
-  return Number.parseFloat(priceText.replace(/[^0-9.]/g, '')) || 0;
-}
 
 export default function ProductListScreen({ route, navigation }: Props) {
   const { categoryId, categoryTitle } = route.params;
@@ -72,16 +69,7 @@ export default function ProductListScreen({ route, navigation }: Props) {
   }, [categoryId, categoryTitle, endCursor, hasNextPage, loading, loadingMore]);
 
   const onPressAdd = (item: ProductDetailProduct) => {
-    addItem({
-      id: item.id,
-      title: item.title,
-      variantTitle: 'Default',
-      imageUrl: item.imageUrl,
-      unitPrice: parsePrice(item.newPrice),
-      compareAtPrice: parsePrice(item.oldPrice),
-      quantity: 1,
-      inventoryNote: 'Ships in 24 hours',
-    });
+    addItem(cartItemFromProductDetail(item, 1));
   };
 
   return (

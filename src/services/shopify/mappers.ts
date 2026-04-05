@@ -60,9 +60,14 @@ export function toProductDetailProduct(node: ShopifyProductNode): ProductDetailP
 
   const imageUrls = collectProductImageUrls(node);
   const description = node.description?.trim();
+  const firstVariant = node.variants?.nodes?.[0];
+  const variantId = firstVariant?.id;
+  const variantTitle = firstVariant?.title?.trim();
 
   return {
     id: node.id,
+    ...(variantId ? { variantId } : {}),
+    ...(variantTitle ? { variantTitle } : {}),
     title: node.title,
     imageUrl: imageUrls[0] ?? 'https://via.placeholder.com/600x600?text=No+Image',
     imageUrls: imageUrls.length > 1 ? imageUrls : undefined,

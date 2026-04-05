@@ -2,6 +2,8 @@ import React, { createContext, useContext, useMemo, useState, type ReactNode } f
 
 export type CartLine = {
   id: string;
+  /** Shopify ProductVariant GID; sent to Storefront checkout */
+  merchandiseId?: string;
   title: string;
   variantTitle: string;
   imageUrl: string;
@@ -13,6 +15,7 @@ export type CartLine = {
 
 export type AddCartItemInput = {
   id: string;
+  merchandiseId?: string;
   title: string;
   variantTitle: string;
   imageUrl: string;
@@ -89,13 +92,15 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const total = subtotal - discountAmount + shippingAmount + estimatedTax;
 
   const addItem = (item: AddCartItemInput) => {
+    const lineKey = item.merchandiseId ?? item.id;
     setItems((prev) => {
-      const idx = prev.findIndex((line) => line.id === item.id);
+      const idx = prev.findIndex((line) => line.id === lineKey);
       if (idx === -1) {
         return [
           ...prev,
           {
             ...item,
+            id: lineKey,
             quantity: Math.max(1, item.quantity ?? 1),
           },
         ];

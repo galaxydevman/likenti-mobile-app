@@ -17,6 +17,7 @@ import { HomeSearchBar } from '../components/home/HomeSearchBar';
 import type { HomeStackChildScreenProps, ProductDetailProduct } from '../navigation/types';
 import { fetchStorefrontProductSearch } from '../services/shopify';
 import { useCart } from '../context/CartContext';
+import { cartItemFromProductDetail } from '../utils/cartLineFromProduct';
 import { styles } from '../styles/SearchScreen.styles';
 
 const TRENDING_KEYWORDS = [
@@ -97,10 +98,6 @@ const SEARCH_DEBOUNCE_MS = 400;
 const MIN_QUERY_LENGTH = 2;
 
 type Props = HomeStackChildScreenProps<'Search'>;
-
-function parsePrice(priceText: string): number {
-  return Number.parseFloat(priceText.replace(/[^0-9.]/g, '')) || 0;
-}
 
 export default function SearchScreen({ navigation }: Props) {
   const { addItem } = useCart();
@@ -256,16 +253,7 @@ export default function SearchScreen({ navigation }: Props) {
   }, [debouncedQuery, endCursor, hasNextPage, loading, loadingMore]);
 
   const onPressAdd = (item: ProductDetailProduct) => {
-    addItem({
-      id: item.id,
-      title: item.title,
-      variantTitle: 'Default',
-      imageUrl: item.imageUrl,
-      unitPrice: parsePrice(item.newPrice),
-      compareAtPrice: parsePrice(item.oldPrice),
-      quantity: 1,
-      inventoryNote: 'Ships in 24 hours',
-    });
+    addItem(cartItemFromProductDetail(item, 1));
   };
 
   const isSearchActive = debouncedQuery.length >= MIN_QUERY_LENGTH;

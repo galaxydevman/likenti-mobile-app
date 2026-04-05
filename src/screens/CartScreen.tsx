@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import {
+  ActivityIndicator,
   Alert,
   Pressable,
   ScrollView,
@@ -12,34 +13,79 @@ import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useNavigation } from '@react-navigation/native';
 import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
+import type { CompositeNavigationProp } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useCart } from '../context/CartContext';
+import { createStorefrontCheckoutUrl } from '../services/shopify';
 import { colors } from '../theme/colors';
 import { cartColors, styles } from '../styles/CartScreen.styles';
-import type { RootTabParamList } from '../navigation/types';
+import type { CartStackParamList, RootTabParamList } from '../navigation/types';
 
 function formatCurrency(value: number): string {
   return `$${value.toFixed(2)}`;
 }
 
+type CartScreenNav = CompositeNavigationProp<
+  NativeStackNavigationProp<CartStackParamList, 'CartMain'>,
+  BottomTabNavigationProp<RootTabParamList, 'Cart'>
+>;
+
 /** Switch to Home tab and reset its stack to the home feed. */
-function navigateToMainHome(navigation: BottomTabNavigationProp<RootTabParamList>) {
+function navigateToMainHome(navigation: CartScreenNav) {
   navigation.navigate('Home', { screen: 'Home' });
 }
 
 export default function CartScreen() {
   const insets = useSafeAreaInsets();
-  const navigation = useNavigation<BottomTabNavigationProp<RootTabParamList>>();
+  const navigation = useNavigation<CartScreenNav>();
   const { items, subtotal, updateQuantity, removeItem } = useCart();
 
   const [orderNote, setOrderNote] = useState('');
+  const [checkoutLoading, setCheckoutLoading] = useState(false);
+
+  const openShopifyCheckout = async () => {
+    const lines = items
+      .filter((line) => line.merchandiseId)
+      .map((line) => ({
+        merchandiseId: line.merchandiseId as string,
+        quantity: line.quantity,
+      }));
+
+    if (lines.length === 0) {
+      Alert.alert(
+        'Checkout',
+        'Your cart has no Shopify products. Add items from the shop catalog to check out, or remove sample items.'
+      );
+      return;
+    }
+
+    if (lines.length !== items.length) {
+      Alert.alert(
+        'Checkout',
+        'Some items cannot be sent to Shopify checkout (sample products). Remove them or replace them with catalog products.'
+      );
+      return;
+    }
+
+    setCheckoutLoading(true);
+    try {
+      const checkoutUrl = await createStorefrontCheckoutUrl(lines);
+      navigation.navigate('CheckoutWebView', { checkoutUrl });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Could not start checkout.';
+      Alert.alert('Checkout failed', message);
+    } finally {
+      setCheckoutLoading(false);
+    }
+  };
 
   const onCheckout = () => {
-    Alert.alert('Checkout', 'Proceeding to secure checkout...');
+    void openShopifyCheckout();
   };
 
   const onPayPal = () => {
-    Alert.alert('PayPal', 'PayPal checkout would open here.');
+    void openShopifyCheckout();
   };
 
   const goHome = () => {
@@ -227,14 +273,28 @@ export default function CartScreen() {
             end={{ x: 1, y: 1 }}
             style={styles.checkoutGradient}
           >
-            <Pressable onPress={onCheckout} style={styles.checkoutBtnInner} accessibilityRole="button">
-              <Text style={styles.checkoutBtnText}>Checkout</Text>
+            <Pressable
+              onPress={onCheckout}
+              style={styles.checkoutBtnInner}
+              accessibilityRole="button"
+              disabled={checkoutLoading}
+            >
+              {checkoutLoading ? (
+                <ActivityIndicator color="#fff" />
+              ) : (
+                <Text style={styles.checkoutBtnText}>Checkout</Text>
+              )}
             </Pressable>
           </LinearGradient>
 
           <Text style={styles.orText}>or</Text>
 
-          <Pressable style={styles.paypalBtn} onPress={onPayPal} accessibilityRole="button">
+          <Pressable
+            style={styles.paypalBtn}
+            onPress={onPayPal}
+            accessibilityRole="button"
+            disabled={checkoutLoading}
+          >
             <Text style={styles.paypalMark}>Pay</Text>
             <Text style={styles.paypalWord}>Pal</Text>
           </Pressable>

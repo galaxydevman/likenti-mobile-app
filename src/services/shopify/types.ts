@@ -25,6 +25,9 @@ export type ShopifyProductNode = {
     minVariantPrice: MoneyV2;
     maxVariantPrice: MoneyV2;
   };
+  variants?: {
+    nodes: Array<{ id: string; title?: string | null }>;
+  };
 };
 
 export type ProductsResponse = {

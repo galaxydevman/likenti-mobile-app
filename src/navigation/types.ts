@@ -8,6 +8,10 @@ import type { NativeStackNavigationProp, NativeStackScreenProps } from '@react-n
 
 export type ProductDetailProduct = {
   id: string;
+  /** Storefront ProductVariant GID; required for Shopify Checkout */
+  variantId?: string;
+  /** Label from Shopify variant (e.g. size); falls back to "Default" in cart when missing */
+  variantTitle?: string;
   title: string;
   imageUrl: string;
   /** Extra gallery images from Shopify; detail screen falls back to [imageUrl] when absent */
@@ -31,10 +35,15 @@ export type HomeStackParamList = {
   ProductDetail: { product: ProductDetailProduct };
 };
 
+export type CartStackParamList = {
+  CartMain: undefined;
+  CheckoutWebView: { checkoutUrl: string };
+};
+
 export type RootTabParamList = {
-  Nuhdeek: undefined;
+  Likdeek: undefined;
   Home: NavigatorScreenParams<HomeStackParamList> | undefined;
-  Cart: undefined;
+  Cart: NavigatorScreenParams<CartStackParamList> | undefined;
   Account: undefined;
   More: undefined;
 };

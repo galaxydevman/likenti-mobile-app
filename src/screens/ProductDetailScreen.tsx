@@ -23,6 +23,7 @@ import type { HomeStackParamList, ProductDetailProduct } from '../navigation/typ
 import { colors } from '../theme/colors';
 import { useTheme } from '../theme/ThemeContext';
 import { useCart } from '../context/CartContext';
+import { cartItemFromProductDetail } from '../utils/cartLineFromProduct';
 import { useRecentlyViewed } from '../context/RecentlyViewedContext';
 import { getRecommendedProducts } from '../data/productCatalog';
 import { TopPicksPanel } from '../components/home/TopPicksPanel';
@@ -273,29 +274,11 @@ export default function ProductDetailScreen({ route, navigation }: Props) {
   }, []);
 
   const onPressAddFromRail = (item: ProductDetailProduct) => {
-    addItem({
-      id: item.id,
-      title: item.title,
-      variantTitle: 'Default',
-      imageUrl: item.imageUrl,
-      unitPrice: parsePrice(item.newPrice),
-      compareAtPrice: parsePrice(item.oldPrice),
-      quantity: 1,
-      inventoryNote: 'Ships in 24 hours',
-    });
+    addItem(cartItemFromProductDetail(item, 1));
   };
 
   const onAddToCart = () => {
-    addItem({
-      id: product.id,
-      title: product.title,
-      variantTitle: 'Default',
-      imageUrl: product.imageUrl,
-      unitPrice,
-      compareAtPrice,
-      quantity,
-      inventoryNote: 'Ships in 24 hours',
-    });
+    addItem(cartItemFromProductDetail(product, quantity));
     Alert.alert('Added to cart', `${quantity} item(s) added successfully.`);
   };
 

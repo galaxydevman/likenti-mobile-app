@@ -34,6 +34,12 @@ export const PRODUCTS_QUERY = `
             currencyCode
           }
         }
+        variants(first: 1) {
+          nodes {
+            id
+            title
+          }
+        }
       }
       pageInfo {
         hasNextPage
@@ -77,6 +83,12 @@ export const PRODUCT_SEARCH_QUERY = `
           maxVariantPrice {
             amount
             currencyCode
+          }
+        }
+        variants(first: 1) {
+          nodes {
+            id
+            title
           }
         }
       }
@@ -125,11 +137,32 @@ export const COLLECTION_PRODUCTS_QUERY = `
               currencyCode
             }
           }
+          variants(first: 1) {
+            nodes {
+              id
+              title
+            }
+          }
         }
         pageInfo {
           hasNextPage
           endCursor
         }
+      }
+    }
+  }
+`;
+
+export const CART_CREATE_MUTATION = `
+  mutation CartCreate($input: CartInput!) {
+    cartCreate(input: $input) {
+      cart {
+        id
+        checkoutUrl
+      }
+      userErrors {
+        field
+        message
       }
     }
   }
