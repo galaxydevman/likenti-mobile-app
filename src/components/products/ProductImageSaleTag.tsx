@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { Platform, StyleSheet, Text, View } from 'react-native';
+import { Platform, StyleSheet, Text, View, type ViewProps } from 'react-native';
 import { Image } from 'expo-image';
 import { colors } from '../../theme/colors';
 
@@ -22,9 +22,17 @@ type Props = {
   oldPrice: string;
   newPrice: string;
   scale?: number;
+  /** Use `"none"` when the badge sits on a pressable image so taps still open the viewer. */
+  pointerEvents?: ViewProps['pointerEvents'];
 };
 
-export function ProductImageSaleTag({ visible, oldPrice, newPrice, scale = 1 }: Props) {
+export function ProductImageSaleTag({
+  visible,
+  oldPrice,
+  newPrice,
+  scale = 1,
+  pointerEvents = 'auto',
+}: Props) {
   const pct = useMemo(() => computePercentOff(oldPrice, newPrice), [oldPrice, newPrice]);
 
   if (!visible || pct <= 0) return null;
@@ -43,7 +51,10 @@ export function ProductImageSaleTag({ visible, oldPrice, newPrice, scale = 1 }: 
       : ({ mixBlendMode: 'lighten' as const } satisfies View['props']['style']);
 
   return (
-    <View style={[styles.shadowWrap, { top: offset, left: offset, width: W, height: W }]}>
+    <View
+      style={[styles.shadowWrap, { top: offset, left: offset, width: W, height: W }]}
+      pointerEvents={pointerEvents}
+    >
       <View style={[styles.blendClip, { width: W, height: W, borderRadius: radius }, blendLayerStyle]}>
         <Image
           source={SALE_BADGE}

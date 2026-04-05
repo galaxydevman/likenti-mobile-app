@@ -27,6 +27,7 @@ import { cartItemFromProductDetail } from '../utils/cartLineFromProduct';
 import { useRecentlyViewed } from '../context/RecentlyViewedContext';
 import { getRecommendedProducts } from '../data/productCatalog';
 import { TopPicksPanel } from '../components/home/TopPicksPanel';
+import { ProductImageSaleTag } from '../components/products/ProductImageSaleTag';
 import { styles } from '../styles/ProductDetailScreen.styles';
 
 const SAMPLE_REVIEWS: { author: string; rating: number; date: string; text: string }[] = [
@@ -316,6 +317,13 @@ export default function ProductDetailScreen({ route, navigation }: Props) {
                 index,
               })}
             />
+            <ProductImageSaleTag
+              visible={Boolean(product.oldPrice.trim() && compareAtPrice > unitPrice)}
+              oldPrice={product.oldPrice}
+              newPrice={product.newPrice}
+              scale={Math.min(1.35, Math.max(1.05, slideWidth / 300))}
+              pointerEvents="none"
+            />
             <Pressable
               style={styles.galleryHeartBtn}
               onPress={() => setIsFavorite((v) => !v)}
@@ -355,10 +363,6 @@ export default function ProductDetailScreen({ route, navigation }: Props) {
           </View>
 
           <Text style={styles.title}>{product.title}</Text>
-          <View style={styles.savePill}>
-            <Ionicons name="pricetag-outline" size={14} color={colors.white} />
-            <Text style={styles.saveText}>{product.saveLabel}</Text>
-          </View>
 
           <View style={styles.priceRow}>
             <Text style={styles.newPrice}>{formatCurrency(unitPrice)}</Text>
