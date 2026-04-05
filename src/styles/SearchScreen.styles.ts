@@ -135,10 +135,16 @@ export const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgba(15, 23, 42, 0.08)',
   },
-  image: {
+  imageWrap: {
     width: '100%',
     height: 170,
+    position: 'relative',
     backgroundColor: 'rgba(15, 23, 42, 0.04)',
+  },
+  image: {
+    width: '100%',
+    height: '100%',
+    backgroundColor: 'transparent',
   },
   cardBody: {
     padding: 12,

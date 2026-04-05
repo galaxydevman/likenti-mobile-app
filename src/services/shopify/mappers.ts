@@ -55,8 +55,10 @@ export function toProductDetailProduct(node: ShopifyProductNode): ProductDetailP
 
   const currentValue = Number.parseFloat(current.amount) || 0;
   const compareValue = Number.parseFloat(compareAt.amount) || currentValue;
-  const savingPct =
-    compareValue > currentValue ? Math.round(((compareValue - currentValue) / compareValue) * 100) : 0;
+  const hasCompareDiscount = compareValue > currentValue;
+  const savingPct = hasCompareDiscount
+    ? Math.round(((compareValue - currentValue) / compareValue) * 100)
+    : 0;
 
   const imageUrls = collectProductImageUrls(node);
   const description = node.description?.trim();
@@ -73,7 +75,7 @@ export function toProductDetailProduct(node: ShopifyProductNode): ProductDetailP
     imageUrls: imageUrls.length > 1 ? imageUrls : undefined,
     ...(description ? { description } : {}),
     saveLabel: savingPct > 0 ? `Save ${savingPct}%` : 'Best price',
-    oldPrice: formatMoney(compareAt),
+    oldPrice: hasCompareDiscount ? formatMoney(compareAt) : '',
     newPrice: formatMoney(current),
     badgeLabel: 'Shopify',
     rating: 4.5,

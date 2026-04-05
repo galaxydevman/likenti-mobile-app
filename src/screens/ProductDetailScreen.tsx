@@ -362,7 +362,9 @@ export default function ProductDetailScreen({ route, navigation }: Props) {
 
           <View style={styles.priceRow}>
             <Text style={styles.newPrice}>{formatCurrency(unitPrice)}</Text>
-            <Text style={styles.oldPrice}>{formatCurrency(compareAtPrice)}</Text>
+            {product.oldPrice.trim() && compareAtPrice > unitPrice ? (
+              <Text style={styles.oldPrice}>{formatCurrency(compareAtPrice)}</Text>
+            ) : null}
           </View>
 
           <View style={styles.qtyRow}>

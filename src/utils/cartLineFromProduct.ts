@@ -11,13 +11,16 @@ export function cartItemFromProductDetail(product: ProductDetailProduct, quantit
   const merchandiseId = product.variantId;
   const lineId = merchandiseId ?? product.id;
 
+  const unitPrice = parsePrice(product.newPrice);
+  const compareParsed = parsePrice(product.oldPrice);
+
   return {
     id: lineId,
     title: product.title,
     variantTitle,
     imageUrl: product.imageUrl,
-    unitPrice: parsePrice(product.newPrice),
-    compareAtPrice: parsePrice(product.oldPrice),
+    unitPrice,
+    compareAtPrice: compareParsed > unitPrice ? compareParsed : undefined,
     quantity: Math.max(1, quantity),
     inventoryNote: 'Ships in 24 hours',
     ...(merchandiseId ? { merchandiseId } : {}),

@@ -18,6 +18,7 @@ import type { HomeStackChildScreenProps, ProductDetailProduct } from '../navigat
 import { fetchStorefrontProductSearch } from '../services/shopify';
 import { useCart } from '../context/CartContext';
 import { cartItemFromProductDetail } from '../utils/cartLineFromProduct';
+import { ProductImageSaleTag } from '../components/products/ProductImageSaleTag';
 import { styles } from '../styles/SearchScreen.styles';
 
 const TRENDING_KEYWORDS = [
@@ -338,14 +339,21 @@ export default function SearchScreen({ navigation }: Props) {
         }
         renderItem={({ item }) => (
           <Pressable style={styles.card} onPress={() => navigation.navigate('ProductDetail', { product: item })}>
-            <Image source={{ uri: item.imageUrl }} style={styles.image} contentFit="cover" />
+            <View style={styles.imageWrap}>
+              <Image source={{ uri: item.imageUrl }} style={styles.image} contentFit="cover" />
+              <ProductImageSaleTag
+                visible={Boolean(item.oldPrice)}
+                oldPrice={item.oldPrice}
+                newPrice={item.newPrice}
+              />
+            </View>
             <View style={styles.cardBody}>
               <Text style={styles.title} numberOfLines={2}>
                 {item.title}
               </Text>
               <View style={styles.priceRow}>
                 <Text style={styles.newPrice}>{item.newPrice}</Text>
-                <Text style={styles.oldPrice}>{item.oldPrice}</Text>
+                {item.oldPrice ? <Text style={styles.oldPrice}>{item.oldPrice}</Text> : null}
               </View>
               <Pressable style={styles.addBtn} onPress={() => onPressAdd(item)}>
                 <Text style={styles.addBtnText}>Add to cart</Text>

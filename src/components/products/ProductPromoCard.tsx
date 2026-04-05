@@ -4,6 +4,7 @@ import { Image } from 'expo-image';
 import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../../theme/colors';
 import { styles } from '../../styles/ProductPromoCard.styles';
+import { ProductImageSaleTag } from './ProductImageSaleTag';
 
 export type ProductPromoCardItem = {
   id: string;
@@ -55,6 +56,13 @@ export function ProductPromoCard({
           </View>
         ) : null}
 
+        <ProductImageSaleTag
+          visible={Boolean(item.oldPrice)}
+          oldPrice={item.oldPrice}
+          newPrice={item.newPrice}
+          scale={scale}
+        />
+
         <Pressable
           style={[styles.heartCircle, { top: Math.round(12 * scale), right: Math.round(12 * scale) }]}
           hitSlop={10}
@@ -100,9 +108,11 @@ export function ProductPromoCard({
       </View>
 
       <View style={styles.priceRow}>
-        <Text style={styles.oldPrice} numberOfLines={1}>
-          {item.oldPrice}
-        </Text>
+        {item.oldPrice ? (
+          <Text style={styles.oldPrice} numberOfLines={1}>
+            {item.oldPrice}
+          </Text>
+        ) : null}
         <Text style={styles.newPrice} numberOfLines={1}>
           {item.newPrice}
         </Text>

@@ -216,18 +216,20 @@ export default function HomeScreen() {
         title="Likenti Top Picks"
         products={TOP_PICKS}
         onPressItem={(item) => navigation.navigate('ProductDetail', { product: item })}
-        onPressAdd={(item) =>
+        onPressAdd={(item) => {
+          const unitPrice = parsePrice(item.newPrice);
+          const compareParsed = parsePrice(item.oldPrice);
           addItem({
             id: item.id,
             title: item.title,
             variantTitle: 'Default',
             imageUrl: item.imageUrl,
-            unitPrice: parsePrice(item.newPrice),
-            compareAtPrice: parsePrice(item.oldPrice),
+            unitPrice,
+            compareAtPrice: compareParsed > unitPrice ? compareParsed : undefined,
             quantity: 1,
             inventoryNote: 'Ships in 24 hours',
-          })
-        }
+          });
+        }}
       />
       <PromoImageCarousel slides={PROMO_SLIDES} height={200} />
       <ShopifyGridImageSlider slides={GRID_SLIDES} />
