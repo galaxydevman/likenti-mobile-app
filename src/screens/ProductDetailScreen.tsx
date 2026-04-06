@@ -25,7 +25,7 @@ import { useTheme } from '../theme/ThemeContext';
 import { useCart } from '../context/CartContext';
 import { cartItemFromProductDetail } from '../utils/cartLineFromProduct';
 import { useRecentlyViewed } from '../context/RecentlyViewedContext';
-import { getRecommendedProducts } from '../data/productCatalog';
+import { fetchStorefrontRecommendedProducts } from '../services/shopify';
 import { TopPicksPanel } from '../components/home/TopPicksPanel';
 import { ProductImageSaleTag } from '../components/products/ProductImageSaleTag';
 import { styles } from '../styles/ProductDetailScreen.styles';
@@ -126,6 +126,7 @@ export default function ProductDetailScreen({ route, navigation }: Props) {
   const [viewerMountKey, setViewerMountKey] = useState(0);
   const [descriptionExpanded, setDescriptionExpanded] = useState(false);
   const [descriptionContentHeight, setDescriptionContentHeight] = useState(0);
+  const [recommendedProducts, setRecommendedProducts] = useState<ProductDetailProduct[]>([]);
   const descriptionHeightAnim = useRef(new Animated.Value(0)).current;
   const descriptionChevronAnim = useRef(new Animated.Value(0)).current;
   const galleryListRef = useRef<FlatList<string>>(null);
@@ -231,12 +232,25 @@ export default function ProductDetailScreen({ route, navigation }: Props) {
   const unitPrice = useMemo(() => parsePrice(product.newPrice), [product.newPrice]);
   const compareAtPrice = useMemo(() => parsePrice(product.oldPrice), [product.oldPrice]);
 
-  const recommendedProducts = useMemo(() => getRecommendedProducts(product, 8), [product]);
-
   const continueFromRecent = useMemo(
     () => recentlyViewedItems.filter((p) => p.id !== product.id).slice(0, 10),
     [recentlyViewedItems, product.id],
   );
+
+  useEffect(() => {
+    let alive = true;
+    (async () => {
+      try {
+        const items = await fetchStorefrontRecommendedProducts(product, 8);
+        if (alive) setRecommendedProducts(items);
+      } catch {
+        if (alive) setRecommendedProducts([]);
+      }
+    })();
+    return () => {
+      alive = false;
+    };
+  }, [product]);
 
   const aboutText = useMemo(() => {
     const raw = product.description?.trim();

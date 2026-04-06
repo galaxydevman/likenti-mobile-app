@@ -4,6 +4,7 @@ import { COLLECTION_PRODUCTS_QUERY, PRODUCTS_QUERY, PRODUCT_SEARCH_QUERY } from 
 import type {
   FetchStorefrontProductsParams,
   FetchStorefrontProductSearchParams,
+  ProductDetailProduct,
   ProductsResponse,
   StorefrontProductsPage,
 } from './types';
@@ -78,4 +79,43 @@ export async function fetchStorefrontProductSearch(
     hasNextPage: pageInfo?.hasNextPage ?? false,
     endCursor: pageInfo?.endCursor ?? null,
   };
+}
+
+export async function fetchStorefrontRecommendedProducts(
+  currentProduct: ProductDetailProduct,
+  limit = 8
+): Promise<ProductDetailProduct[]> {
+  const max = Math.max(1, limit);
+  const relatedByType: ProductDetailProduct[] = [];
+
+  if (currentProduct.productType?.trim()) {
+    const typeQuery = `product_type:"${currentProduct.productType.trim()}"`;
+    const byType = await fetchStorefrontProductSearch({
+      searchQuery: typeQuery,
+      pageSize: Math.max(16, max + 4),
+    });
+    relatedByType.push(...byType.items.filter((item) => item.id !== currentProduct.id));
+  }
+
+  if (relatedByType.length >= max) {
+    return relatedByType.slice(0, max);
+  }
+
+  const bestSellingFallback = await fetchStorefrontProducts({
+    categoryId: 'all',
+    categoryTitle: 'All',
+    pageSize: Math.max(24, max + 12),
+  });
+
+  const merged: ProductDetailProduct[] = [];
+  const seen = new Set<string>([currentProduct.id]);
+
+  for (const item of [...relatedByType, ...bestSellingFallback.items]) {
+    if (merged.length >= max) break;
+    if (seen.has(item.id)) continue;
+    seen.add(item.id);
+    merged.push(item);
+  }
+
+  return merged;
 }

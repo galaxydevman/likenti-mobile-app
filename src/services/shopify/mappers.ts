@@ -62,6 +62,7 @@ export function toProductDetailProduct(node: ShopifyProductNode): ProductDetailP
 
   const imageUrls = collectProductImageUrls(node);
   const description = node.description?.trim();
+  const productType = node.productType?.trim();
   const firstVariant = node.variants?.nodes?.[0];
   const variantId = firstVariant?.id;
   const variantTitle = firstVariant?.title?.trim();
@@ -74,6 +75,7 @@ export function toProductDetailProduct(node: ShopifyProductNode): ProductDetailP
     imageUrl: imageUrls[0] ?? 'https://via.placeholder.com/600x600?text=No+Image',
     imageUrls: imageUrls.length > 1 ? imageUrls : undefined,
     ...(description ? { description } : {}),
+    ...(productType ? { productType } : {}),
     saveLabel: savingPct > 0 ? `Save ${savingPct}%` : 'Best price',
     oldPrice: hasCompareDiscount ? formatMoney(compareAt) : '',
     newPrice: formatMoney(current),
@@ -85,20 +87,19 @@ export function toProductDetailProduct(node: ShopifyProductNode): ProductDetailP
 export function toMenuCategory(item: ShopifyMenuItem): StorefrontMenuCategory | null {
   const title = item.title?.trim();
   if (!title) return null;
+  const resource = item.resource;
+  const isCollectionResource =
+    resource?.__typename === 'Collection' && 'handle' in resource;
 
   const collectionHandle =
-    item.resource?.__typename === 'Collection'
-      ? item.resource.handle
-      : parseCollectionHandleFromUrl(item.url);
+    isCollectionResource ? resource.handle : parseCollectionHandleFromUrl(item.url);
 
   if (!collectionHandle) {
     return null;
   }
 
   const collectionImageUrl =
-    item.resource?.__typename === 'Collection'
-      ? item.resource.image?.url ?? item.resource.products?.nodes?.[0]?.featuredImage?.url
-      : null;
+    isCollectionResource ? resource.image?.url ?? resource.products?.nodes?.[0]?.featuredImage?.url : null;
 
   const imageUrl = collectionImageUrl ?? `https://via.placeholder.com/300x300?text=${encodeURIComponent(title)}`;
 
@@ -133,7 +134,9 @@ function toFieldMap(node: ShopifyMetaobjectNode): Map<string, ShopifyMetaobjectN
 export function toHeroBanner(node: ShopifyMetaobjectNode): StorefrontHeroBanner | null {
   const fields = toFieldMap(node);
   const imageField = fields.get('image');
-  const imageUrl = imageField?.reference?.__typename === 'MediaImage' ? imageField.reference.image?.url : null;
+  const imageRef = imageField?.reference;
+  const imageUrl =
+    imageRef?.__typename === 'MediaImage' && 'image' in imageRef ? imageRef.image?.url : null;
 
   if (!imageUrl) {
     return null;

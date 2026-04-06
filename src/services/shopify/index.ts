@@ -1,4 +1,8 @@
-export { fetchStorefrontProducts, fetchStorefrontProductSearch } from './products';
+export {
+  fetchStorefrontProducts,
+  fetchStorefrontProductSearch,
+  fetchStorefrontRecommendedProducts,
+} from './products';
 export { fetchStorefrontMainMenuCategories } from './menu';
 export { fetchStorefrontHeroBanners } from './hero';
 export { createStorefrontCheckoutUrl } from './checkout';

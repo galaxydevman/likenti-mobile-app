@@ -18,6 +18,8 @@ export type ProductDetailProduct = {
   imageUrls?: string[];
   /** Plain text from Shopify `description` or catalog */
   description?: string;
+  /** Shopify productType; used to compute related products */
+  productType?: string;
   saveLabel: string;
   oldPrice: string;
   newPrice: string;
