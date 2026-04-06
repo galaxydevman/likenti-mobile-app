@@ -25,8 +25,18 @@ const SORT_OPTIONS: { key: SortOption; label: string }[] = [
 
 const SHEET_OPEN_MS = 320;
 const SHEET_CLOSE_MS = 260;
-const BACKDROP_OPEN_MS = 260;
-const BACKDROP_CLOSE_MS = 220;
+const FILTER_ROWS = [
+  'Title',
+  'Vendor',
+  'Tags',
+  'Size',
+  'Product type',
+  'Price',
+  'Discount',
+  'Color',
+  'Collections',
+  'Availability',
+];
 
 function parsePriceValue(priceText: string): number {
   return Number.parseFloat(priceText.replace(/[^0-9.]/g, '')) || 0;
@@ -52,9 +62,12 @@ export default function ProductListScreen({ route, navigation }: Props) {
   const [endCursor, setEndCursor] = useState<string | null>(null);
   const [hasNextPage, setHasNextPage] = useState(true);
   const [selectedSort, setSelectedSort] = useState<SortOption>('relevance');
+  const [filterOnSaleOnly, setFilterOnSaleOnly] = useState(false);
+  const [draftFilterOnSaleOnly, setDraftFilterOnSaleOnly] = useState(false);
   const [isSortSheetVisible, setIsSortSheetVisible] = useState(false);
+  const [isFilterSheetVisible, setIsFilterSheetVisible] = useState(false);
   const sortSheetAnim = useRef(new Animated.Value(0)).current;
-  const sortBackdropAnim = useRef(new Animated.Value(0)).current;
+  const filterSheetAnim = useRef(new Animated.Value(0)).current;
 
   const loadProducts = useCallback(async (isRefresh = false) => {
     setLoading(true);
@@ -106,8 +119,13 @@ export default function ProductListScreen({ route, navigation }: Props) {
     addItem(cartItemFromProductDetail(item, 1));
   };
 
+  const filteredProducts = useMemo(() => {
+    if (!filterOnSaleOnly) return products;
+    return products.filter((item) => Boolean(item.oldPrice) && getDiscountPercent(item) > 0);
+  }, [filterOnSaleOnly, products]);
+
   const sortedProducts = useMemo(() => {
-    const list = [...products];
+    const list = [...filteredProducts];
     switch (selectedSort) {
       case 'price-low-high':
         return list.sort((a, b) => parsePriceValue(a.newPrice) - parsePriceValue(b.newPrice));
@@ -122,56 +140,66 @@ export default function ProductListScreen({ route, navigation }: Props) {
       default:
         return list;
     }
-  }, [products, selectedSort]);
+  }, [filteredProducts, selectedSort]);
+
+  const filteredCountForDraft = useMemo(() => {
+    if (!draftFilterOnSaleOnly) return products.length;
+    return products.filter((item) => Boolean(item.oldPrice) && getDiscountPercent(item) > 0).length;
+  }, [draftFilterOnSaleOnly, products]);
 
   const closeSortSheet = useCallback(() => {
-    Animated.parallel([
-      Animated.timing(sortSheetAnim, {
-        toValue: 0,
-        duration: SHEET_CLOSE_MS,
-        easing: Easing.in(Easing.cubic),
-        useNativeDriver: true,
-      }),
-      Animated.timing(sortBackdropAnim, {
-        toValue: 0,
-        duration: BACKDROP_CLOSE_MS,
-        easing: Easing.inOut(Easing.quad),
-        useNativeDriver: true,
-      }),
-    ]).start(() => setIsSortSheetVisible(false));
-  }, [sortBackdropAnim, sortSheetAnim]);
+    Animated.timing(sortSheetAnim, {
+      toValue: 0,
+      duration: SHEET_CLOSE_MS,
+      easing: Easing.in(Easing.cubic),
+      useNativeDriver: true,
+    }).start(() => setIsSortSheetVisible(false));
+  }, [sortSheetAnim]);
 
   const openSortSheet = useCallback(() => {
     sortSheetAnim.stopAnimation();
-    sortBackdropAnim.stopAnimation();
     sortSheetAnim.setValue(0);
-    sortBackdropAnim.setValue(0);
     setIsSortSheetVisible(true);
-    Animated.parallel([
-      Animated.spring(sortSheetAnim, {
-        toValue: 1,
-        damping: 24,
-        stiffness: 210,
-        mass: 0.95,
-        useNativeDriver: true,
-      }),
-      Animated.timing(sortBackdropAnim, {
-        toValue: 1,
-        duration: BACKDROP_OPEN_MS,
-        easing: Easing.inOut(Easing.quad),
-        useNativeDriver: true,
-      }),
-    ]).start();
-  }, [sortBackdropAnim, sortSheetAnim]);
+    Animated.spring(sortSheetAnim, {
+      toValue: 1,
+      damping: 24,
+      stiffness: 210,
+      mass: 0.95,
+      useNativeDriver: true,
+    }).start();
+  }, [sortSheetAnim]);
+
+  const closeFilterSheet = useCallback(() => {
+    Animated.timing(filterSheetAnim, {
+      toValue: 0,
+      duration: SHEET_CLOSE_MS,
+      easing: Easing.in(Easing.cubic),
+      useNativeDriver: true,
+    }).start(() => setIsFilterSheetVisible(false));
+  }, [filterSheetAnim]);
+
+  const openFilterSheet = useCallback(() => {
+    filterSheetAnim.stopAnimation();
+    filterSheetAnim.setValue(0);
+    setDraftFilterOnSaleOnly(filterOnSaleOnly);
+    setIsFilterSheetVisible(true);
+    Animated.spring(filterSheetAnim, {
+      toValue: 1,
+      damping: 24,
+      stiffness: 210,
+      mass: 0.95,
+      useNativeDriver: true,
+    }).start();
+  }, [filterOnSaleOnly, filterSheetAnim]);
 
   const sheetTranslateY = sortSheetAnim.interpolate({
     inputRange: [0, 1],
     outputRange: [320, 0],
   });
 
-  const backdropOpacity = sortBackdropAnim.interpolate({
+  const filterSheetTranslateY = filterSheetAnim.interpolate({
     inputRange: [0, 1],
-    outputRange: [0, 0.45],
+    outputRange: [420, 0],
   });
 
   return (
@@ -244,7 +272,7 @@ export default function ProductListScreen({ route, navigation }: Props) {
       />
       <View style={[styles.actionBarWrap, { paddingBottom: Math.max(insets.bottom, 8) }]}>
         <View style={styles.actionBar}>
-          <Pressable style={styles.actionBtn}>
+          <Pressable style={styles.actionBtn} onPress={openFilterSheet}>
             <Ionicons name="options-outline" size={18} color={colors.white} />
             <Text style={styles.actionBtnText}>Filters</Text>
           </Pressable>
@@ -262,9 +290,7 @@ export default function ProductListScreen({ route, navigation }: Props) {
         onRequestClose={closeSortSheet}
         statusBarTranslucent
       >
-        <Animated.View style={[styles.sortBackdrop, { opacity: backdropOpacity }]}>
-          <Pressable style={styles.sortBackdropTapArea} onPress={closeSortSheet} />
-        </Animated.View>
+        <Pressable style={styles.sortBackdropTapArea} onPress={closeSortSheet} />
         <Animated.View
           style={[
             styles.sortSheetWrap,
@@ -293,6 +319,66 @@ export default function ProductListScreen({ route, navigation }: Props) {
                 ) : null}
               </Pressable>
             ))}
+          </View>
+        </Animated.View>
+      </Modal>
+      <Modal
+        transparent
+        visible={isFilterSheetVisible}
+        animationType="none"
+        onRequestClose={closeFilterSheet}
+        statusBarTranslucent
+      >
+        <Pressable style={styles.sortBackdropTapArea} onPress={closeFilterSheet} />
+        <Animated.View
+          style={[
+            styles.sortSheetWrap,
+            { paddingBottom: Math.max(insets.bottom, 10), transform: [{ translateY: filterSheetTranslateY }] },
+          ]}
+        >
+          <View style={styles.filterSheet}>
+            <View style={styles.sortSheetHeader}>
+              <Text style={styles.sortSheetTitle}>Filters</Text>
+              <Pressable style={styles.sortCloseBtn} onPress={closeFilterSheet}>
+                <Ionicons name="close" size={40} color={colors.headerBlue} />
+              </Pressable>
+            </View>
+            <View style={styles.filterRowsWrap}>
+              {FILTER_ROWS.map((row) => (
+                <View key={row}>
+                  <Pressable
+                    style={styles.filterRow}
+                    onPress={() => {
+                      if (row === 'Discount') {
+                        setDraftFilterOnSaleOnly((prev) => !prev);
+                      }
+                    }}
+                  >
+                    <Text style={styles.filterRowText}>{row}</Text>
+                    <Ionicons
+                      name={row === 'Discount' && draftFilterOnSaleOnly ? 'remove' : 'add'}
+                      size={40}
+                      color="#0F172A"
+                    />
+                  </Pressable>
+                  {row === 'Discount' && draftFilterOnSaleOnly ? (
+                    <Pressable style={styles.filterSubOption} onPress={() => setDraftFilterOnSaleOnly((prev) => !prev)}>
+                      <Ionicons name="checkmark-circle" size={20} color={colors.headerBlue} />
+                      <Text style={styles.filterSubOptionText}>On Sale only</Text>
+                    </Pressable>
+                  ) : null}
+                </View>
+              ))}
+            </View>
+            <Pressable
+              style={styles.filterApplyBtn}
+              onPress={() => {
+                setFilterOnSaleOnly(draftFilterOnSaleOnly);
+                closeFilterSheet();
+              }}
+            >
+              <Text style={styles.filterApplyBtnText}>Show {filteredCountForDraft} result(s)</Text>
+            </Pressable>
           </View>
         </Animated.View>
       </Modal>

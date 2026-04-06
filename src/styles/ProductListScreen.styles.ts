@@ -169,12 +169,9 @@ export const styles = StyleSheet.create({
     fontWeight: '700',
     lineHeight: 24,
   },
-  sortBackdrop: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: '#000000',
-  },
   sortBackdropTapArea: {
-    flex: 1,
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'transparent',
   },
   sortSheetWrap: {
     position: 'absolute',
@@ -222,5 +219,55 @@ export const styles = StyleSheet.create({
     fontWeight: '400',
     color: colors.textDark,
     lineHeight: 24,
+  },
+  filterSheet: {
+    backgroundColor: colors.white,
+    borderTopLeftRadius: 26,
+    borderTopRightRadius: 26,
+    paddingHorizontal: 20,
+    paddingTop: 18,
+    paddingBottom: 12,
+    minHeight: 560,
+  },
+  filterRowsWrap: {
+    marginTop: 4,
+  },
+  filterRow: {
+    minHeight: 64,
+    borderTopWidth: 1,
+    borderTopColor: '#F1F5F9',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  filterRowText: {
+    fontSize: 18,
+    fontWeight: '400',
+    color: colors.textDark,
+  },
+  filterSubOption: {
+    minHeight: 42,
+    paddingBottom: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  filterSubOptionText: {
+    fontSize: 15,
+    color: colors.textDark,
+    fontWeight: '500',
+  },
+  filterApplyBtn: {
+    marginTop: 10,
+    height: 56,
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.headerBlue,
+  },
+  filterApplyBtnText: {
+    color: colors.white,
+    fontSize: 16,
+    fontWeight: '700',
   },
 });
