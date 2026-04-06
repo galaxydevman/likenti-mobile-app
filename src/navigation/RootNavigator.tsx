@@ -7,6 +7,7 @@ import { Pressable, StyleSheet, View } from 'react-native';
 import HomeScreen from '../screens/HomeScreen';
 import PlaceholderScreen from '../screens/PlaceholderScreen';
 import CartScreen from '../screens/CartScreen';
+import LikdeekScreen from '../screens/LikdeekScreen';
 import CheckoutWebViewScreen from '../screens/CheckoutWebViewScreen';
 import ProductDetailScreen from '../screens/ProductDetailScreen';
 import SearchScreen from '../screens/SearchScreen';
@@ -48,7 +49,7 @@ function TabBarChromeBackground() {
   );
 }
 function LikdeekTab() {
-  return <PlaceholderScreen title="Likdeek" />;
+  return <LikdeekScreen />;
 }
 function AccountTab() {
   return <PlaceholderScreen title="Account" />;

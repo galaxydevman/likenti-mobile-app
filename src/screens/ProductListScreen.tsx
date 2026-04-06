@@ -66,9 +66,11 @@ export default function ProductListScreen({ route, navigation }: Props) {
   const [draftFilterOnSaleOnly, setDraftFilterOnSaleOnly] = useState(false);
   const [isSortSheetVisible, setIsSortSheetVisible] = useState(false);
   const [isFilterSheetVisible, setIsFilterSheetVisible] = useState(false);
+  const [showScrollToTop, setShowScrollToTop] = useState(false);
   const sortSheetAnim = useRef(new Animated.Value(0)).current;
   const sortBackdropAnim = useRef(new Animated.Value(0)).current;
   const filterSheetAnim = useRef(new Animated.Value(0)).current;
+  const listRef = useRef<FlatList<ProductDetailProduct> | null>(null);
 
   const loadProducts = useCallback(async (isRefresh = false) => {
     setLoading(true);
@@ -226,9 +228,20 @@ export default function ProductListScreen({ route, navigation }: Props) {
     outputRange: [0, SORT_BACKDROP_MAX_OPACITY],
   });
 
+  const onListScroll = useCallback((event: { nativeEvent: { contentOffset: { y: number } } }) => {
+    const offsetY = event.nativeEvent.contentOffset.y;
+    const shouldShow = offsetY > 260;
+    setShowScrollToTop((prev) => (prev === shouldShow ? prev : shouldShow));
+  }, []);
+
+  const scrollToTop = useCallback(() => {
+    listRef.current?.scrollToOffset({ offset: 0, animated: true });
+  }, []);
+
   return (
     <View style={[styles.root, { backgroundColor: headerTheme.pageBackground }]}>
       <FlatList
+        ref={listRef}
         data={sortedProducts}
         numColumns={2}
         keyExtractor={(item) => item.id}
@@ -239,6 +252,8 @@ export default function ProductListScreen({ route, navigation }: Props) {
         onRefresh={() => loadProducts(true)}
         onEndReached={loadMoreProducts}
         onEndReachedThreshold={0.35}
+        onScroll={onListScroll}
+        scrollEventThrottle={16}
         ListFooterComponent={
           loading || loadingMore ? (
             <View style={styles.loadingWrap}>
@@ -263,6 +278,16 @@ export default function ProductListScreen({ route, navigation }: Props) {
           />
         )}
       />
+      {showScrollToTop ? (
+        <Pressable
+          style={[styles.scrollTopBtn, { bottom: Math.max(insets.bottom, 8) + 10 }]}
+          onPress={scrollToTop}
+          accessibilityRole="button"
+          accessibilityLabel="Scroll to top"
+        >
+          <Ionicons name="chevron-up" size={22} color={colors.white} />
+        </Pressable>
+      ) : null}
       <View style={[styles.actionBarWrap, { paddingBottom: Math.max(insets.bottom, 8) }]}>
         <View style={styles.actionBar}>
           <Pressable style={styles.actionBtn} onPress={openFilterSheet}>
