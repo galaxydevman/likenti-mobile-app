@@ -52,7 +52,7 @@ function parsePrice(priceText: string): number {
 }
 
 function formatCurrency(value: number): string {
-  return `$${value.toFixed(2)}`;
+  return `د.ت ${value.toFixed(2)}`;
 }
 
 const CONTENT_H_PAD = 16;

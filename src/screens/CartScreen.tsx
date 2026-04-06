@@ -23,7 +23,7 @@ import { cartColors, styles } from '../styles/CartScreen.styles';
 import type { CartStackParamList, RootTabParamList } from '../navigation/types';
 
 function formatCurrency(value: number): string {
-  return `$${value.toFixed(2)}`;
+  return `د.ت ${value.toFixed(2)}`;
 }
 
 type CartScreenNav = CompositeNavigationProp<
