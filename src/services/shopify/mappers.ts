@@ -9,9 +9,9 @@ import type {
 } from './types';
 
 function formatMoney(money?: MoneyV2): string {
-  if (!money) return 'د.ت 0.00';
+  if (!money) return '$0.00';
   const value = Number.parseFloat(money.amount);
-  if (!Number.isFinite(value)) return 'د.ت 0.00';
+  if (!Number.isFinite(value)) return '$0.00';
   const currencySymbols: Record<string, string> = {
     USD: '$',
     EUR: '€',

@@ -15,13 +15,13 @@ import { colors } from '../theme/colors';
 import { useTheme } from '../theme/ThemeContext';
 import { HomeSearchBar } from '../components/home/HomeSearchBar';
 import type { HomeStackChildScreenProps, ProductDetailProduct } from '../navigation/types';
-import { fetchStorefrontProductSearch } from '../services/shopify';
+import { fetchStorefrontMainMenuCategories, fetchStorefrontProductSearch } from '../services/shopify';
 import { useCart } from '../context/CartContext';
 import { cartItemFromProductDetail } from '../utils/cartLineFromProduct';
 import { ProductImageSaleTag } from '../components/products/ProductImageSaleTag';
 import { styles } from '../styles/SearchScreen.styles';
 
-const TRENDING_KEYWORDS = [
+const DEFAULT_TRENDING_KEYWORDS = [
   'Toothpaste',
   'Deodorant',
   'Sunscreen',
@@ -32,7 +32,7 @@ const TRENDING_KEYWORDS = [
   'Baby Diapers',
 ];
 
-const TRENDING_CATEGORIES = [
+const DEFAULT_TRENDING_CATEGORIES = [
   {
     id: 'baby-toiletries',
     label: 'Baby Toiletries',
@@ -115,6 +115,8 @@ export default function SearchScreen({ navigation }: Props) {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [endCursor, setEndCursor] = useState<string | null>(null);
   const [hasNextPage, setHasNextPage] = useState(false);
+  const [trendingKeywords, setTrendingKeywords] = useState<string[]>(DEFAULT_TRENDING_KEYWORDS);
+  const [trendingCategories, setTrendingCategories] = useState(DEFAULT_TRENDING_CATEGORIES);
 
   const scheduleSearch = useCallback((text: string) => {
     if (debounceTimerRef.current) {
@@ -159,6 +161,41 @@ export default function SearchScreen({ navigation }: Props) {
       if (debounceTimerRef.current) {
         clearTimeout(debounceTimerRef.current);
       }
+    };
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+    void (async () => {
+      try {
+        const categories = await fetchStorefrontMainMenuCategories();
+        if (cancelled || categories.length === 0) return;
+
+        const normalizedCategories = categories.slice(0, 10).map((category) => ({
+          id: category.id,
+          label: category.title,
+          imageUrl: category.imageUrl,
+        }));
+        setTrendingCategories(normalizedCategories);
+
+        const derivedKeywords = Array.from(
+          new Set(
+            categories
+              .map((category) => category.title.trim())
+              .filter((title) => title.length > 0)
+          )
+        ).slice(0, 8);
+
+        if (derivedKeywords.length > 0) {
+          setTrendingKeywords(derivedKeywords);
+        }
+      } catch {
+        // Keep fallback data if menu categories are unavailable.
+      }
+    })();
+
+    return () => {
+      cancelled = true;
     };
   }, []);
 
@@ -264,7 +301,7 @@ export default function SearchScreen({ navigation }: Props) {
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Trending Keywords</Text>
         <View style={styles.keywordsWrap}>
-          {TRENDING_KEYWORDS.map((keyword) => (
+          {trendingKeywords.map((keyword) => (
             <Pressable key={keyword} style={styles.keywordChip} onPress={() => applyKeyword(keyword)}>
               <Ionicons name="trending-up" size={18} color="#4CAF50" />
               <Text style={styles.keywordText}>{keyword}</Text>
@@ -276,7 +313,7 @@ export default function SearchScreen({ navigation }: Props) {
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Trending Categories</Text>
         <View style={styles.categoriesList}>
-          {TRENDING_CATEGORIES.map((category) => (
+          {trendingCategories.map((category) => (
             <Pressable key={category.id} style={styles.categoryItem} onPress={() => applyKeyword(category.label)}>
               <View style={styles.categoryCircle}>
                 <Image source={{ uri: category.imageUrl }} style={styles.categoryImage} contentFit="cover" />
