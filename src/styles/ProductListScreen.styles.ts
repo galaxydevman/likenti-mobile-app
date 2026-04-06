@@ -173,6 +173,10 @@ export const styles = StyleSheet.create({
     ...StyleSheet.absoluteFillObject,
     backgroundColor: 'transparent',
   },
+  sortBackdrop: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: '#000000',
+  },
   sortSheetWrap: {
     position: 'absolute',
     left: 0,
@@ -227,10 +231,14 @@ export const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingTop: 18,
     paddingBottom: 12,
-    minHeight: 560,
+    maxHeight: 700,
   },
   filterRowsWrap: {
     marginTop: 4,
+    maxHeight: 380,
+  },
+  filterRowsContent: {
+    paddingBottom: 8,
   },
   filterRow: {
     minHeight: 64,

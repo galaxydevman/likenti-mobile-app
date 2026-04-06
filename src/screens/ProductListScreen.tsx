@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { ActivityIndicator, Animated, Easing, FlatList, Modal, Pressable, Text, View } from 'react-native';
+import { ActivityIndicator, Animated, Easing, FlatList, Modal, Pressable, ScrollView, Text, View } from 'react-native';
 import { Image } from 'expo-image';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -25,6 +25,7 @@ const SORT_OPTIONS: { key: SortOption; label: string }[] = [
 
 const SHEET_OPEN_MS = 320;
 const SHEET_CLOSE_MS = 260;
+const SORT_BACKDROP_MAX_OPACITY = 0.45;
 const FILTER_ROWS = [
   'Title',
   'Vendor',
@@ -67,6 +68,7 @@ export default function ProductListScreen({ route, navigation }: Props) {
   const [isSortSheetVisible, setIsSortSheetVisible] = useState(false);
   const [isFilterSheetVisible, setIsFilterSheetVisible] = useState(false);
   const sortSheetAnim = useRef(new Animated.Value(0)).current;
+  const sortBackdropAnim = useRef(new Animated.Value(0)).current;
   const filterSheetAnim = useRef(new Animated.Value(0)).current;
 
   const loadProducts = useCallback(async (isRefresh = false) => {
@@ -148,26 +150,44 @@ export default function ProductListScreen({ route, navigation }: Props) {
   }, [draftFilterOnSaleOnly, products]);
 
   const closeSortSheet = useCallback(() => {
-    Animated.timing(sortSheetAnim, {
-      toValue: 0,
-      duration: SHEET_CLOSE_MS,
-      easing: Easing.in(Easing.cubic),
-      useNativeDriver: true,
-    }).start(() => setIsSortSheetVisible(false));
-  }, [sortSheetAnim]);
+    Animated.parallel([
+      Animated.timing(sortSheetAnim, {
+        toValue: 0,
+        duration: SHEET_CLOSE_MS,
+        easing: Easing.in(Easing.cubic),
+        useNativeDriver: true,
+      }),
+      Animated.timing(sortBackdropAnim, {
+        toValue: 0,
+        duration: 200,
+        easing: Easing.inOut(Easing.quad),
+        useNativeDriver: true,
+      }),
+    ]).start(() => setIsSortSheetVisible(false));
+  }, [sortBackdropAnim, sortSheetAnim]);
 
   const openSortSheet = useCallback(() => {
     sortSheetAnim.stopAnimation();
+    sortBackdropAnim.stopAnimation();
     sortSheetAnim.setValue(0);
+    sortBackdropAnim.setValue(0);
     setIsSortSheetVisible(true);
-    Animated.spring(sortSheetAnim, {
-      toValue: 1,
-      damping: 24,
-      stiffness: 210,
-      mass: 0.95,
-      useNativeDriver: true,
-    }).start();
-  }, [sortSheetAnim]);
+    Animated.parallel([
+      Animated.spring(sortSheetAnim, {
+        toValue: 1,
+        damping: 24,
+        stiffness: 210,
+        mass: 0.95,
+        useNativeDriver: true,
+      }),
+      Animated.timing(sortBackdropAnim, {
+        toValue: 1,
+        duration: 240,
+        easing: Easing.inOut(Easing.quad),
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, [sortBackdropAnim, sortSheetAnim]);
 
   const closeFilterSheet = useCallback(() => {
     Animated.timing(filterSheetAnim, {
@@ -200,6 +220,11 @@ export default function ProductListScreen({ route, navigation }: Props) {
   const filterSheetTranslateY = filterSheetAnim.interpolate({
     inputRange: [0, 1],
     outputRange: [420, 0],
+  });
+
+  const sortBackdropOpacity = sortBackdropAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0, SORT_BACKDROP_MAX_OPACITY],
   });
 
   return (
@@ -290,11 +315,13 @@ export default function ProductListScreen({ route, navigation }: Props) {
         onRequestClose={closeSortSheet}
         statusBarTranslucent
       >
-        <Pressable style={styles.sortBackdropTapArea} onPress={closeSortSheet} />
+        <Animated.View style={[styles.sortBackdrop, { opacity: sortBackdropOpacity }]}>
+          <Pressable style={styles.sortBackdropTapArea} onPress={closeSortSheet} />
+        </Animated.View>
         <Animated.View
           style={[
             styles.sortSheetWrap,
-            { paddingBottom: Math.max(insets.bottom, 10), transform: [{ translateY: sheetTranslateY }] },
+            {transform: [{ translateY: sheetTranslateY }] },
           ]}
         >
           <View style={styles.sortSheet}>
@@ -343,7 +370,11 @@ export default function ProductListScreen({ route, navigation }: Props) {
                 <Ionicons name="close" size={40} color={colors.headerBlue} />
               </Pressable>
             </View>
-            <View style={styles.filterRowsWrap}>
+            <ScrollView
+              style={styles.filterRowsWrap}
+              contentContainerStyle={styles.filterRowsContent}
+              showsVerticalScrollIndicator
+            >
               {FILTER_ROWS.map((row) => (
                 <View key={row}>
                   <Pressable
@@ -369,7 +400,7 @@ export default function ProductListScreen({ route, navigation }: Props) {
                   ) : null}
                 </View>
               ))}
-            </View>
+            </ScrollView>
             <Pressable
               style={styles.filterApplyBtn}
               onPress={() => {
