@@ -169,4 +169,58 @@ export const styles = StyleSheet.create({
     fontWeight: '700',
     lineHeight: 24,
   },
+  sortBackdrop: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: '#000000',
+  },
+  sortBackdropTapArea: {
+    flex: 1,
+  },
+  sortSheetWrap: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: 0,
+  },
+  sortSheet: {
+    backgroundColor: colors.white,
+    borderTopLeftRadius: 26,
+    borderTopRightRadius: 26,
+    paddingHorizontal: 20,
+    paddingTop: 18,
+    paddingBottom: 12,
+  },
+  sortSheetHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 8,
+  },
+  sortSheetTitle: {
+    fontSize: 20,
+    fontWeight: '600',
+    color: colors.textDark,
+    lineHeight: 28,
+  },
+  sortCloseBtn: {
+    width: 50,
+    height: 50,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  sortOptionBtn: {
+    minHeight: 60,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    borderTopWidth: 1,
+    borderTopColor: '#F1F5F9',
+    paddingVertical: 10,
+  },
+  sortOptionText: {
+    fontSize: 18,
+    fontWeight: '400',
+    color: colors.textDark,
+    lineHeight: 24,
+  },
 });
