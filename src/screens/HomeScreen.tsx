@@ -1,5 +1,16 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { ActivityIndicator, Animated, Linking, StatusBar as RNStatusBar, Text, View } from 'react-native';
+import {
+  ActivityIndicator,
+  Animated,
+  Easing,
+  Linking,
+  Modal,
+  Pressable,
+  StatusBar as RNStatusBar,
+  Text,
+  TextInput,
+  View,
+} from 'react-native';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { HomeHeader } from '../components/home/HomeHeader';
 import { AnnouncementBar } from '../components/home/AnnouncementBar';
@@ -88,6 +99,10 @@ export default function HomeScreen() {
   const [heroSlides, setHeroSlides] = useState<HeroSlide[] | null>(null);
   const [topPicksProducts, setTopPicksProducts] = useState<TopPickProduct[] | null>(null);
   const [storefrontLoading, setStorefrontLoading] = useState(true);
+  const [notificationVisible, setNotificationVisible] = useState(false);
+  const [emailValue, setEmailValue] = useState('');
+  const notificationAnim = useRef(new Animated.Value(0)).current;
+  const hasAutoOpenedNotification = useRef(false);
 
   const parsePrice = (priceText: string) =>
     Number.parseFloat(priceText.replace(/[^0-9.]/g, '')) || 0;
@@ -214,6 +229,41 @@ export default function HomeScreen() {
     }, [headerTheme.statusBarStyle])
   );
 
+  const openNotificationModal = useCallback(() => {
+    notificationAnim.stopAnimation();
+    notificationAnim.setValue(0);
+    setNotificationVisible(true);
+    Animated.timing(notificationAnim, {
+      toValue: 1,
+      duration: 320,
+      easing: Easing.out(Easing.cubic),
+      useNativeDriver: true,
+    }).start();
+  }, [notificationAnim]);
+
+  const closeNotificationModal = useCallback(() => {
+    notificationAnim.stopAnimation();
+    Animated.timing(notificationAnim, {
+      toValue: 0,
+      duration: 220,
+      easing: Easing.in(Easing.cubic),
+      useNativeDriver: true,
+    }).start(({ finished }) => {
+      if (finished) {
+        setNotificationVisible(false);
+      }
+    });
+  }, [notificationAnim]);
+
+  useEffect(() => {
+    if (storefrontLoading || hasAutoOpenedNotification.current) return;
+    hasAutoOpenedNotification.current = true;
+    const timer = setTimeout(() => {
+      openNotificationModal();
+    }, 220);
+    return () => clearTimeout(timer);
+  }, [openNotificationModal, storefrontLoading]);
+
   if (storefrontLoading) {
     return (
       <View style={[styles.root, styles.loadingScreen, { backgroundColor: headerTheme.pageBackground }]}>
@@ -235,7 +285,11 @@ export default function HomeScreen() {
       scrollEventThrottle={16}
     >
       <View style={[styles.stickyHeader, { backgroundColor: headerBleedColor }]}>
-        <HomeHeader scrollY={scrollY} onSearchPress={() => navigation.navigate('Search')} />
+        <HomeHeader
+          scrollY={scrollY}
+          onSearchPress={() => navigation.navigate('Search')}
+          onPressNotification={openNotificationModal}
+        />
       </View>
       {/* <AnnouncementBar /> */}
       <HeroCarousel slides={heroSlides ?? DEFAULT_HERO_SLIDES} />
@@ -261,6 +315,82 @@ export default function HomeScreen() {
       />
       <PromoImageCarousel slides={PROMO_SLIDES} height={200} />
       <ShopifyGridImageSlider slides={GRID_SLIDES} />
+      <Modal
+        visible={notificationVisible}
+        transparent
+        animationType="none"
+        statusBarTranslucent
+        onRequestClose={closeNotificationModal}
+      >
+        <Animated.View
+          style={[
+            styles.notificationOverlay,
+            {
+              opacity: notificationAnim.interpolate({
+                inputRange: [0, 1],
+                outputRange: [0, 1],
+              }),
+            },
+          ]}
+        >
+          <Animated.View
+            style={[
+              styles.notificationCard,
+              {
+                opacity: notificationAnim,
+                transform: [
+                  {
+                    translateY: notificationAnim.interpolate({
+                      inputRange: [0, 1],
+                      outputRange: [24, 0],
+                    }),
+                  },
+                  {
+                    scale: notificationAnim.interpolate({
+                      inputRange: [0, 1],
+                      outputRange: [0.97, 1],
+                    }),
+                  },
+                ],
+              },
+            ]}
+          >
+            <Pressable
+              style={styles.notificationCloseBtn}
+              onPress={closeNotificationModal}
+              accessibilityRole="button"
+              accessibilityLabel="Close notification"
+            >
+              <Text style={styles.notificationCloseText}>×</Text>
+            </Pressable>
+            <View style={styles.notificationPatternLayer}>
+              <View style={[styles.notificationPatternBlob, styles.notificationPatternBlobOne]} />
+              <View style={[styles.notificationPatternBlob, styles.notificationPatternBlobTwo]} />
+              <View style={[styles.notificationPatternBlob, styles.notificationPatternBlobThree]} />
+              <View style={[styles.notificationPatternBlob, styles.notificationPatternBlobFour]} />
+            </View>
+            <Text style={styles.notificationTitle}>Save 10% off your first purchase</Text>
+            <Text style={styles.notificationSubtitle}>
+              Sign up today and we'll send you a 10% discount code towards your first purchase.
+            </Text>
+            <View style={styles.notificationInputRow}>
+              <TextInput
+                value={emailValue}
+                onChangeText={setEmailValue}
+                placeholder="Inscrivez-vous à notre"
+                placeholderTextColor="#D4D7DE"
+                keyboardType="email-address"
+                autoCapitalize="none"
+                autoCorrect={false}
+                style={styles.notificationInput}
+              />
+              <Pressable style={styles.notificationSubmitBtn}>
+                <Text style={styles.notificationSubmitText}>S'inscrire</Text>
+              </Pressable>
+            </View>
+          </Animated.View>
+        </Animated.View>
+      </Modal>
     </Animated.ScrollView>
   );
 }
