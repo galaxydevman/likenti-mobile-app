@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ActivityIndicator, Animated, Easing, FlatList, Modal, Pressable, ScrollView, Text, View } from 'react-native';
-import { Image } from 'expo-image';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors } from '../theme/colors';
@@ -9,7 +8,7 @@ import { useCart } from '../context/CartContext';
 import { cartItemFromProductDetail } from '../utils/cartLineFromProduct';
 import type { HomeStackChildScreenProps, ProductDetailProduct } from '../navigation/types';
 import { fetchStorefrontProducts } from '../services/shopify';
-import { ProductImageSaleTag } from '../components/products/ProductImageSaleTag';
+import { ProductGridCard } from '../components/products/ProductGridCard';
 import { styles } from '../styles/ProductListScreen.styles';
 
 type Props = HomeStackChildScreenProps<'ProductList'>;
@@ -257,42 +256,11 @@ export default function ProductListScreen({ route, navigation }: Props) {
           )
         }
         renderItem={({ item }) => (
-          <Pressable style={styles.card} onPress={() => navigation.navigate('ProductDetail', { product: item })}>
-            <View style={styles.imageWrap}>
-              <Image source={{ uri: item.imageUrl }} style={styles.image} contentFit="cover" />
-              <Pressable
-                style={styles.favoriteBtn}
-                onPress={(event) => {
-                  event.stopPropagation();
-                }}
-              >
-                <Ionicons name="heart-outline" size={20} color={colors.headerBlue} />
-              </Pressable>
-              <Pressable
-                style={styles.quickAddBtn}
-                onPress={(event) => {
-                  event.stopPropagation();
-                  onPressAdd(item);
-                }}
-              >
-                <Ionicons name="add" size={26} color={colors.white} />
-              </Pressable>
-              <ProductImageSaleTag
-                visible={Boolean(item.oldPrice)}
-                oldPrice={item.oldPrice}
-                newPrice={item.newPrice}
-              />
-            </View>
-            <View style={styles.cardBody}>
-              <Text style={styles.title} numberOfLines={2}>
-                {item.title}
-              </Text>
-              <View style={styles.priceRow}>
-                <Text style={styles.newPrice}>{item.newPrice}</Text>
-                {item.oldPrice ? <Text style={styles.oldPrice}>{item.oldPrice}</Text> : null}
-              </View>
-            </View>
-          </Pressable>
+          <ProductGridCard
+            item={item}
+            onPressCard={() => navigation.navigate('ProductDetail', { product: item })}
+            onPressAdd={() => onPressAdd(item)}
+          />
         )}
       />
       <View style={[styles.actionBarWrap, { paddingBottom: Math.max(insets.bottom, 8) }]}>

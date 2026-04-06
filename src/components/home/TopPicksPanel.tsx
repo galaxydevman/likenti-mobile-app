@@ -1,9 +1,9 @@
 import React, { useMemo } from 'react';
 import { FlatList, Text, View } from 'react-native';
-import { ProductPromoCard, type ProductPromoCardItem } from '../products/ProductPromoCard';
-import { styles, GAP, OUTER_PAD, CARD_W, CARD_H } from '../../styles/TopPicksPanel.styles';
+import { ProductGridCard, type ProductGridCardItem } from '../products/ProductGridCard';
+import { styles, GAP, OUTER_PAD, CARD_W } from '../../styles/TopPicksPanel.styles';
 
-export type TopPickProduct = ProductPromoCardItem;
+export type TopPickProduct = ProductGridCardItem;
 
 type Props = {
   title?: string;
@@ -24,10 +24,9 @@ export function TopPicksPanel({ title = 'Likenti Top Picks', products, onPressIt
         keyExtractor={keyExtractor}
         renderItem={({ item, index }) => (
           <View style={{ marginRight: index === products.length - 1 ? 0 : GAP }}>
-            <ProductPromoCard
+            <ProductGridCard
               item={item}
-              cardWidth={CARD_W}
-              cardHeight={CARD_H}
+              width={CARD_W}
               onPressCard={() => onPressItem?.(item)}
               onPressAdd={() => onPressAdd?.(item)}
             />

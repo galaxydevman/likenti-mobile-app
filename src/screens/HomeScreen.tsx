@@ -11,7 +11,11 @@ import { TopPicksPanel, type TopPickProduct } from '../components/home/TopPicksP
 import { useCart } from '../context/CartContext';
 import type { HomeScreenNavigationProp } from '../navigation/types';
 import { CATALOG_PRODUCTS, PRODUCT_CATEGORIES } from '../data/productCatalog';
-import { fetchStorefrontHeroBanners, fetchStorefrontMainMenuCategories } from '../services/shopify';
+import {
+  fetchStorefrontHeroBanners,
+  fetchStorefrontMainMenuCategories,
+  fetchStorefrontProducts,
+} from '../services/shopify';
 import { styles } from '../styles/HomeScreen.styles';
 import { colors } from '../theme/colors';
 import { useTheme } from '../theme/ThemeContext';
@@ -82,6 +86,7 @@ export default function HomeScreen() {
   const headerBleedColor = headerTheme.gradientColors?.[0] ?? headerTheme.backgroundColor ?? '#1a2744';
   const [menuCategories, setMenuCategories] = useState<CategoryItem[] | null>(null);
   const [heroSlides, setHeroSlides] = useState<HeroSlide[] | null>(null);
+  const [topPicksProducts, setTopPicksProducts] = useState<TopPickProduct[] | null>(null);
   const [storefrontLoading, setStorefrontLoading] = useState(true);
 
   const parsePrice = (priceText: string) =>
@@ -145,8 +150,31 @@ export default function HomeScreen() {
       }
     };
 
+    const loadTopPicks = async () => {
+      try {
+        const page = await fetchStorefrontProducts({
+          categoryId: 'all',
+          categoryTitle: 'All',
+          pageSize: 20,
+        });
+        if (!alive || page.items.length === 0) return;
+        const validWithImage = page.items.filter(
+          (item) =>
+            Boolean(item.imageUrl?.trim()) &&
+            !item.imageUrl.includes('via.placeholder.com') &&
+            !item.imageUrl.includes('No+Image')
+        );
+        if (validWithImage.length === 0) return;
+        setTopPicksProducts(validWithImage.slice(0, 5));
+      } catch {
+        if (alive) {
+          setTopPicksProducts(null);
+        }
+      }
+    };
+
     const load = async () => {
-      await Promise.all([loadMenuCategories(), loadHeroBanners()]);
+      await Promise.all([loadMenuCategories(), loadHeroBanners(), loadTopPicks()]);
       if (alive) {
         setStorefrontLoading(false);
       }
@@ -214,7 +242,7 @@ export default function HomeScreen() {
       <ShopByCategory categories={categories} />
       <TopPicksPanel
         title="Likenti Top Picks"
-        products={TOP_PICKS}
+        products={topPicksProducts ?? TOP_PICKS}
         onPressItem={(item) => navigation.navigate('ProductDetail', { product: item })}
         onPressAdd={(item) => {
           const unitPrice = parsePrice(item.newPrice);
