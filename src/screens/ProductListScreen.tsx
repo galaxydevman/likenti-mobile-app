@@ -1,6 +1,8 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator, FlatList, Pressable, Text, View } from 'react-native';
 import { Image } from 'expo-image';
+import { Ionicons } from '@expo/vector-icons';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors } from '../theme/colors';
 import { useTheme } from '../theme/ThemeContext';
 import { useCart } from '../context/CartContext';
@@ -15,6 +17,7 @@ type Props = HomeStackChildScreenProps<'ProductList'>;
 export default function ProductListScreen({ route, navigation }: Props) {
   const { categoryId, categoryTitle } = route.params;
   const { headerTheme } = useTheme();
+  const insets = useSafeAreaInsets();
   const { addItem } = useCart();
   const [products, setProducts] = useState<ProductDetailProduct[]>([]);
   const [loading, setLoading] = useState(true);
@@ -79,7 +82,7 @@ export default function ProductListScreen({ route, navigation }: Props) {
         data={products}
         numColumns={2}
         keyExtractor={(item) => item.id}
-        contentContainerStyle={styles.content}
+        contentContainerStyle={[styles.content, { paddingBottom: 110 + insets.bottom }]}
         columnWrapperStyle={styles.row}
         ListHeaderComponent={<Text style={styles.heading}>{categoryTitle}</Text>}
         refreshing={loading}
@@ -106,6 +109,23 @@ export default function ProductListScreen({ route, navigation }: Props) {
           <Pressable style={styles.card} onPress={() => navigation.navigate('ProductDetail', { product: item })}>
             <View style={styles.imageWrap}>
               <Image source={{ uri: item.imageUrl }} style={styles.image} contentFit="cover" />
+              <Pressable
+                style={styles.favoriteBtn}
+                onPress={(event) => {
+                  event.stopPropagation();
+                }}
+              >
+                <Ionicons name="heart-outline" size={20} color={colors.headerBlue} />
+              </Pressable>
+              <Pressable
+                style={styles.quickAddBtn}
+                onPress={(event) => {
+                  event.stopPropagation();
+                  onPressAdd(item);
+                }}
+              >
+                <Ionicons name="add" size={26} color={colors.white} />
+              </Pressable>
               <ProductImageSaleTag
                 visible={Boolean(item.oldPrice)}
                 oldPrice={item.oldPrice}
@@ -120,13 +140,23 @@ export default function ProductListScreen({ route, navigation }: Props) {
                 <Text style={styles.newPrice}>{item.newPrice}</Text>
                 {item.oldPrice ? <Text style={styles.oldPrice}>{item.oldPrice}</Text> : null}
               </View>
-              <Pressable style={styles.addBtn} onPress={() => onPressAdd(item)}>
-                <Text style={styles.addBtnText}>Add to cart</Text>
-              </Pressable>
             </View>
           </Pressable>
         )}
       />
+      <View style={[styles.actionBarWrap, { paddingBottom: Math.max(insets.bottom, 8) }]}>
+        <View style={styles.actionBar}>
+          <Pressable style={styles.actionBtn}>
+            <Ionicons name="options-outline" size={18} color={colors.white} />
+            <Text style={styles.actionBtnText}>Filters</Text>
+          </Pressable>
+          <View style={styles.actionDivider} />
+          <Pressable style={styles.actionBtn}>
+            <Ionicons name="swap-vertical-outline" size={18} color={colors.white} />
+            <Text style={styles.actionBtnText}>Sort By</Text>
+          </Pressable>
+        </View>
+      </View>
     </View>
   );
 }
