@@ -27,23 +27,9 @@ import { cartItemFromProductDetail } from '../utils/cartLineFromProduct';
 import { useRecentlyViewed } from '../context/RecentlyViewedContext';
 import { fetchStorefrontRecommendedProducts } from '../services/shopify';
 import { TopPicksPanel } from '../components/home/TopPicksPanel';
+import { StoreLoadingView } from '../components/StoreLoadingView';
 import { ProductImageSaleTag } from '../components/products/ProductImageSaleTag';
 import { styles } from '../styles/ProductDetailScreen.styles';
-
-const SAMPLE_REVIEWS: { author: string; rating: number; date: string; text: string }[] = [
-  {
-    author: 'Maya R.',
-    rating: 5,
-    date: 'Mar 2026',
-    text: 'Exactly as described. Fast delivery and well packaged. Happy to shop here again.',
-  },
-  {
-    author: 'Jonas K.',
-    rating: 4,
-    date: 'Feb 2026',
-    text: 'Great quality for the price. Small learning curve on use, but worth it overall.',
-  },
-];
 
 type Props = NativeStackScreenProps<HomeStackParamList, 'ProductDetail'>;
 
@@ -127,6 +113,7 @@ export default function ProductDetailScreen({ route, navigation }: Props) {
   const [descriptionExpanded, setDescriptionExpanded] = useState(false);
   const [descriptionContentHeight, setDescriptionContentHeight] = useState(0);
   const [recommendedProducts, setRecommendedProducts] = useState<ProductDetailProduct[]>([]);
+  const [recommendedLoading, setRecommendedLoading] = useState(true);
   const descriptionHeightAnim = useRef(new Animated.Value(0)).current;
   const descriptionChevronAnim = useRef(new Animated.Value(0)).current;
   const galleryListRef = useRef<FlatList<string>>(null);
@@ -239,12 +226,16 @@ export default function ProductDetailScreen({ route, navigation }: Props) {
 
   useEffect(() => {
     let alive = true;
+    setRecommendedLoading(true);
+    setRecommendedProducts([]);
     (async () => {
       try {
         const items = await fetchStorefrontRecommendedProducts(product, 8);
         if (alive) setRecommendedProducts(items);
       } catch {
         if (alive) setRecommendedProducts([]);
+      } finally {
+        if (alive) setRecommendedLoading(false);
       }
     })();
     return () => {
@@ -268,11 +259,6 @@ export default function ProductDetailScreen({ route, navigation }: Props) {
       }),
     [descriptionChevronAnim],
   );
-
-  const reviewTotalDisplay = useMemo(() => {
-    if (product.reviewCount != null && product.reviewCount > 0) return product.reviewCount;
-    return 48 + (product.id.length % 140);
-  }, [product.id, product.reviewCount]);
 
   useEffect(() => {
     addRecentlyViewed(product);
@@ -402,7 +388,11 @@ export default function ProductDetailScreen({ route, navigation }: Props) {
           </View>
         </View>
 
-        {recommendedProducts.length > 0 ? (
+        {recommendedLoading ? (
+          <View style={styles.railBleed}>
+            <StoreLoadingView message="Loading recommendations…" fullScreen={false} />
+          </View>
+        ) : recommendedProducts.length > 0 ? (
           <View style={styles.railBleed}>
             <TopPicksPanel
               title="Products you might like"
@@ -480,28 +470,22 @@ export default function ProductDetailScreen({ route, navigation }: Props) {
           </View>
         </View>
 
-        <View style={styles.subsectionCard}>
-          <Text style={styles.subsectionTitle}>Product reviews</Text>
-          <View style={styles.reviewsSummary}>
-            <View style={styles.reviewsAverageWrap}>
-              <Text style={styles.reviewsAverage}>{product.rating.toFixed(1)}</Text>
-            </View>
-            <View style={styles.reviewsMeta}>
-              <StarRow value={product.rating} size={16} />
-              <Text style={styles.reviewsBasedOn}>Based on {reviewTotalDisplay} reviews</Text>
+        {product.reviewCount != null && product.reviewCount > 0 ? (
+          <View style={styles.subsectionCard}>
+            <Text style={styles.subsectionTitle}>Product reviews</Text>
+            <View style={styles.reviewsSummary}>
+              <View style={styles.reviewsAverageWrap}>
+                <Text style={styles.reviewsAverage}>{product.rating.toFixed(1)}</Text>
+              </View>
+              <View style={styles.reviewsMeta}>
+                <StarRow value={product.rating} size={16} />
+                <Text style={styles.reviewsBasedOn}>
+                  Based on {product.reviewCount} {product.reviewCount === 1 ? 'review' : 'reviews'}
+                </Text>
+              </View>
             </View>
           </View>
-          {SAMPLE_REVIEWS.map((rev, idx) => (
-            <View key={`${rev.author}-${idx}`} style={[styles.reviewItem, idx === 0 ? styles.reviewItemFirst : null]}>
-              <View style={styles.reviewHeader}>
-                <Text style={styles.reviewAuthor}>{rev.author}</Text>
-                <Text style={styles.reviewDate}>{rev.date}</Text>
-              </View>
-              <StarRow value={rev.rating} size={13} />
-              <Text style={styles.reviewText}>{rev.text}</Text>
-            </View>
-          ))}
-        </View>
+        ) : null}
       </ScrollView>
 
       <View style={[styles.footer, { paddingBottom: Math.max(12, insets.bottom) }]}>

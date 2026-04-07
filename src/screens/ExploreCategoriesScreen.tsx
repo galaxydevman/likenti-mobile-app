@@ -1,8 +1,8 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { ActivityIndicator, FlatList, Pressable, Text, View } from 'react-native';
+import { FlatList, Pressable, Text, View } from 'react-native';
 import { Image } from 'expo-image';
 import { Ionicons } from '@expo/vector-icons';
-import { PRODUCT_CATEGORIES } from '../data/productCatalog';
+import { StoreLoadingView } from '../components/StoreLoadingView';
 import type { HomeStackChildScreenProps } from '../navigation/types';
 import { fetchStorefrontMainMenuCategories, type StorefrontMenuCategory } from '../services/shopify';
 import { colors } from '../theme/colors';
@@ -10,10 +10,6 @@ import { useTheme } from '../theme/ThemeContext';
 import { styles } from '../styles/ExploreCategoriesScreen.styles';
 
 type Props = HomeStackChildScreenProps<'ExploreCategories'>;
-
-const FALLBACK: StorefrontMenuCategory[] = PRODUCT_CATEGORIES.filter((c) => c.id !== 'all').map(
-  (c) => ({ id: c.id, title: c.title, imageUrl: c.imageUrl })
-);
 
 export default function ExploreCategoriesScreen({ navigation }: Props) {
   const { headerTheme } = useTheme();
@@ -27,14 +23,10 @@ export default function ExploreCategoriesScreen({ navigation }: Props) {
       try {
         const items = await fetchStorefrontMainMenuCategories();
         if (!alive) return;
-        if (items.length > 0) {
-          setCategories(items);
-        } else {
-          setCategories(FALLBACK);
-        }
+        setCategories(items.length > 0 ? items : []);
       } catch {
         if (alive) {
-          setCategories(FALLBACK);
+          setCategories([]);
         }
       } finally {
         if (alive) {
@@ -58,9 +50,10 @@ export default function ExploreCategoriesScreen({ navigation }: Props) {
   return (
     <View style={[styles.root, { backgroundColor: headerTheme.pageBackground ?? colors.pageBg }]}>
       {loading ? (
+        <StoreLoadingView message="Loading categories…" />
+      ) : categories.length === 0 ? (
         <View style={styles.loadingWrap}>
-          <ActivityIndicator size="small" color={colors.headerBlue} />
-          <Text style={styles.loadingText}>Loading categories…</Text>
+          <Text style={styles.loadingText}>Could not load categories from your store.</Text>
         </View>
       ) : (
         <FlatList

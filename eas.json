@@ -1,0 +1,39 @@
+{
+  "cli": {
+    "version": ">= 15.0.0",
+    "appVersionSource": "remote"
+  },
+  "build": {
+    "development": {
+      "developmentClient": true,
+      "distribution": "internal",
+      "env": {
+        "EXPO_PUBLIC_SHOPIFY_STORE_DOMAIN": "likenti.myshopify.com",
+        "EXPO_PUBLIC_SHOPIFY_STOREFRONT_ACCESS_TOKEN": "d9e623beff926680a857c1521be683b3"
+      }
+    },
+    "preview": {
+      "distribution": "internal",
+      "env": {
+        "EXPO_PUBLIC_SHOPIFY_STORE_DOMAIN": "likenti.myshopify.com",
+        "EXPO_PUBLIC_SHOPIFY_STOREFRONT_ACCESS_TOKEN": "d9e623beff926680a857c1521be683b3"
+      },
+      "android": {
+        "buildType": "apk"
+      }
+    },
+    "production": {
+      "autoIncrement": true,
+      "env": {
+        "EXPO_PUBLIC_SHOPIFY_STORE_DOMAIN": "likenti.myshopify.com",
+        "EXPO_PUBLIC_SHOPIFY_STOREFRONT_ACCESS_TOKEN": "d9e623beff926680a857c1521be683b3"
+      },
+      "android": {
+        "buildType": "app-bundle"
+      }
+    }
+  },
+  "submit": {
+    "production": {}
+  }
+}

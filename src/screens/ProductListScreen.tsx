@@ -9,6 +9,7 @@ import { cartItemFromProductDetail } from '../utils/cartLineFromProduct';
 import type { HomeStackChildScreenProps, ProductDetailProduct } from '../navigation/types';
 import { fetchStorefrontProducts } from '../services/shopify';
 import { ProductGridCard } from '../components/products/ProductGridCard';
+import { StoreLoadingView } from '../components/StoreLoadingView';
 import { styles } from '../styles/ProductListScreen.styles';
 
 type Props = HomeStackChildScreenProps<'ProductList'>;
@@ -237,6 +238,10 @@ export default function ProductListScreen({ route, navigation }: Props) {
   const scrollToTop = useCallback(() => {
     listRef.current?.scrollToOffset({ offset: 0, animated: true });
   }, []);
+
+  if (loading && products.length === 0) {
+    return <StoreLoadingView message="Loading products…" />;
+  }
 
   return (
     <View style={[styles.root, { backgroundColor: headerTheme.pageBackground }]}>

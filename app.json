@@ -1,13 +1,13 @@
 {
   "expo": {
-    "name": "Expanse Mobile",
-    "slug": "expanse-mobile",
+    "name": "Likenti",
+    "owner": "antony596",
+    "slug": "likenti",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "splash": {
-      "image": "./assets/splash.png",
+      "image": "./assets/icon/likenti_logo_transparent_white.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
@@ -18,20 +18,22 @@
       "supportsTablet": true
     },
     "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#FFFFFF"
-      },
-      "package": "com.tan1007.expansemobile"
+      "package": "com.likentistore.app"
     },
     "web": {
       "bundler": "metro",
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/icon/likenti_logo_transparent_white.png"
     },
     "plugins": [
       "expo-asset",
       "expo-web-browser",
-      "expo-font"
-    ]
+      "expo-font",
+      "expo-secure-store"
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "46326694-5f9e-4ade-9ded-0d44b2b8a9e2"
+      }
+    }
   }
 }

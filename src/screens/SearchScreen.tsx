@@ -19,81 +19,8 @@ import { fetchStorefrontMainMenuCategories, fetchStorefrontProductSearch } from 
 import { useCart } from '../context/CartContext';
 import { cartItemFromProductDetail } from '../utils/cartLineFromProduct';
 import { ProductImageSaleTag } from '../components/products/ProductImageSaleTag';
+import { StoreLoadingView } from '../components/StoreLoadingView';
 import { styles } from '../styles/SearchScreen.styles';
-
-const DEFAULT_TRENDING_KEYWORDS = [
-  'Toothpaste',
-  'Deodorant',
-  'Sunscreen',
-  'Shampoo',
-  'Fragrances',
-  'Lenses',
-  'Napkins',
-  'Baby Diapers',
-];
-
-const DEFAULT_TRENDING_CATEGORIES = [
-  {
-    id: 'baby-toiletries',
-    label: 'Baby Toiletries',
-    imageUrl:
-      'https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?w=400&auto=format&fit=crop&q=80',
-  },
-  {
-    id: 'oral-care',
-    label: 'Oral Care',
-    imageUrl:
-      'https://images.unsplash.com/photo-1607619056574-7b8d3ee536b2?w=400&auto=format&fit=crop&q=80',
-  },
-  {
-    id: 'sanitary-care',
-    label: 'Sanitary Care',
-    imageUrl:
-      'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=400&auto=format&fit=crop&q=80',
-  },
-  {
-    id: 'deodorant',
-    label: 'Deodorant',
-    imageUrl:
-      'https://images.unsplash.com/photo-1612817288484-6f916006741a?w=400&auto=format&fit=crop&q=80',
-  },
-  {
-    id: 'bath-body',
-    label: 'Bath & Body',
-    imageUrl:
-      'https://images.unsplash.com/photo-1571781926291-c477ebfd024b?w=400&auto=format&fit=crop&q=80',
-  },
-  {
-    id: 'baby-nutrition',
-    label: 'Baby Nutrition',
-    imageUrl:
-      'https://images.unsplash.com/photo-1585435557343-3b092031d4a8?w=400&auto=format&fit=crop&q=80',
-  },
-  {
-    id: 'sport-nutrition',
-    label: 'Sport Nutrition',
-    imageUrl:
-      'https://images.unsplash.com/photo-1593095948071-474c5cc2989d?w=400&auto=format&fit=crop&q=80',
-  },
-  {
-    id: 'healthy-nutrition',
-    label: 'Healthy Nutrition',
-    imageUrl:
-      'https://images.unsplash.com/photo-1607619056574-7b8d3ee536b2?w=400&auto=format&fit=crop&q=80',
-  },
-  {
-    id: 'electrical-hair-devices',
-    label: 'Electrical Hair Devices',
-    imageUrl:
-      'https://images.unsplash.com/photo-1580618672591-eb180b1a973f?w=400&auto=format&fit=crop&q=80',
-  },
-  {
-    id: 'lenses-care',
-    label: 'Lenses Care',
-    imageUrl:
-      'https://images.unsplash.com/photo-1574258495973-f010dfbb5371?w=400&auto=format&fit=crop&q=80',
-  },
-];
 
 const SEARCH_DEBOUNCE_MS = 400;
 const MIN_QUERY_LENGTH = 2;
@@ -115,8 +42,11 @@ export default function SearchScreen({ navigation }: Props) {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [endCursor, setEndCursor] = useState<string | null>(null);
   const [hasNextPage, setHasNextPage] = useState(false);
-  const [trendingKeywords, setTrendingKeywords] = useState<string[]>(DEFAULT_TRENDING_KEYWORDS);
-  const [trendingCategories, setTrendingCategories] = useState(DEFAULT_TRENDING_CATEGORIES);
+  const [trendingKeywords, setTrendingKeywords] = useState<string[]>([]);
+  const [trendingCategories, setTrendingCategories] = useState<
+    { id: string; label: string; imageUrl: string }[]
+  >([]);
+  const [trendingLoading, setTrendingLoading] = useState(true);
 
   const scheduleSearch = useCallback((text: string) => {
     if (debounceTimerRef.current) {
@@ -169,7 +99,12 @@ export default function SearchScreen({ navigation }: Props) {
     void (async () => {
       try {
         const categories = await fetchStorefrontMainMenuCategories();
-        if (cancelled || categories.length === 0) return;
+        if (cancelled) return;
+        if (categories.length === 0) {
+          setTrendingCategories([]);
+          setTrendingKeywords([]);
+          return;
+        }
 
         const normalizedCategories = categories.slice(0, 10).map((category) => ({
           id: category.id,
@@ -186,11 +121,16 @@ export default function SearchScreen({ navigation }: Props) {
           )
         ).slice(0, 8);
 
-        if (derivedKeywords.length > 0) {
-          setTrendingKeywords(derivedKeywords);
-        }
+        setTrendingKeywords(derivedKeywords);
       } catch {
-        // Keep fallback data if menu categories are unavailable.
+        if (!cancelled) {
+          setTrendingCategories([]);
+          setTrendingKeywords([]);
+        }
+      } finally {
+        if (!cancelled) {
+          setTrendingLoading(false);
+        }
       }
     })();
 
@@ -296,37 +236,46 @@ export default function SearchScreen({ navigation }: Props) {
 
   const isSearchActive = debouncedQuery.length >= MIN_QUERY_LENGTH;
 
-  const trendingHeader = (
-    <>
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Trending Keywords</Text>
-        <View style={styles.keywordsWrap}>
-          {trendingKeywords.map((keyword) => (
-            <Pressable key={keyword} style={styles.keywordChip} onPress={() => applyKeyword(keyword)}>
-              <Ionicons name="trending-up" size={18} color="#4CAF50" />
-              <Text style={styles.keywordText}>{keyword}</Text>
-            </Pressable>
-          ))}
-        </View>
+  const trendingHeader =
+    trendingKeywords.length === 0 && trendingCategories.length === 0 ? (
+      <View style={styles.emptyBlock}>
+        <Text style={styles.emptyText}>No store categories to show yet.</Text>
       </View>
+    ) : (
+      <>
+        {trendingKeywords.length > 0 ? (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Trending Keywords</Text>
+            <View style={styles.keywordsWrap}>
+              {trendingKeywords.map((keyword) => (
+                <Pressable key={keyword} style={styles.keywordChip} onPress={() => applyKeyword(keyword)}>
+                  <Ionicons name="trending-up" size={18} color="#4CAF50" />
+                  <Text style={styles.keywordText}>{keyword}</Text>
+                </Pressable>
+              ))}
+            </View>
+          </View>
+        ) : null}
 
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Trending Categories</Text>
-        <View style={styles.categoriesList}>
-          {trendingCategories.map((category) => (
-            <Pressable key={category.id} style={styles.categoryItem} onPress={() => applyKeyword(category.label)}>
-              <View style={styles.categoryCircle}>
-                <Image source={{ uri: category.imageUrl }} style={styles.categoryImage} contentFit="cover" />
-              </View>
-              <Text style={styles.categoryText} numberOfLines={2}>
-                {category.label}
-              </Text>
-            </Pressable>
-          ))}
-        </View>
-      </View>
-    </>
-  );
+        {trendingCategories.length > 0 ? (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Trending Categories</Text>
+            <View style={styles.categoriesList}>
+              {trendingCategories.map((category) => (
+                <Pressable key={category.id} style={styles.categoryItem} onPress={() => applyKeyword(category.label)}>
+                  <View style={styles.categoryCircle}>
+                    <Image source={{ uri: category.imageUrl }} style={styles.categoryImage} contentFit="cover" />
+                  </View>
+                  <Text style={styles.categoryText} numberOfLines={2}>
+                    {category.label}
+                  </Text>
+                </Pressable>
+              ))}
+            </View>
+          </View>
+        ) : null}
+      </>
+    );
 
   const searchListHeader = (
     <View style={styles.resultsHeader}>
@@ -345,6 +294,9 @@ export default function SearchScreen({ navigation }: Props) {
 
   return (
     <View style={[styles.root, { backgroundColor: headerTheme.pageBackground }]}>
+      {!isSearchActive && trendingLoading ? (
+        <StoreLoadingView message="Loading search…" />
+      ) : (
       <FlatList
         key={isSearchActive ? 'search-results' : 'search-trending'}
         data={isSearchActive ? products : []}
@@ -399,6 +351,7 @@ export default function SearchScreen({ navigation }: Props) {
           </Pressable>
         )}
       />
+      )}
     </View>
   );
 }

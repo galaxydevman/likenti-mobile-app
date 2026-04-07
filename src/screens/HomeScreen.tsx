@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
-  ActivityIndicator,
   Animated,
   Easing,
   Linking,
@@ -15,79 +14,18 @@ import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { HomeHeader } from '../components/home/HomeHeader';
 import { AnnouncementBar } from '../components/home/AnnouncementBar';
 import { HeroCarousel, type HeroSlide } from '../components/home/HeroCarousel';
-import { PromoImageCarousel, type PromoImageSlide } from '../components/home/PromoImageCarousel';
-import { ShopifyGridImageSlider, type ShopifyGridImageSlide } from '../components/home/ShopifyGridImageSlider';
 import { ShopByCategory, type CategoryItem } from '../components/home/ShopByCategory';
 import { TopPicksPanel, type TopPickProduct } from '../components/home/TopPicksPanel';
+import { StoreLoadingView } from '../components/StoreLoadingView';
 import { useCart } from '../context/CartContext';
 import type { HomeScreenNavigationProp } from '../navigation/types';
-import { CATALOG_PRODUCTS, PRODUCT_CATEGORIES } from '../data/productCatalog';
 import {
   fetchStorefrontHeroBanners,
   fetchStorefrontMainMenuCategories,
   fetchStorefrontProducts,
 } from '../services/shopify';
 import { styles } from '../styles/HomeScreen.styles';
-import { colors } from '../theme/colors';
 import { useTheme } from '../theme/ThemeContext';
-
-/** Placeholder imagery; replace with Storefront API (collections, metaobjects, files). */
-const DEFAULT_HERO_SLIDES: HeroSlide[] = [
-  {
-    id: '1',
-    imageUrl:
-      // Use a known-good demo image (some placeholder entries can appear "empty" at runtime).
-      'https://images.unsplash.com/photo-1522338242992-e1a54906a8da?w=900&auto=format&fit=crop&q=80',
-    brandLabel: 'Energie Fruit',
-    ctaLabel: 'تسوق الآن',
-  },
-  {
-    id: '2',
-    imageUrl:
-      'https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=900&auto=format&fit=crop&q=80',
-    brandLabel: 'Summer glow',
-    ctaLabel: 'Shop now',
-  },
-  {
-    id: '3',
-    imageUrl:
-      'https://images.unsplash.com/photo-1571781926291-c477ebfd024b?w=900&auto=format&fit=crop&q=80',
-    brandLabel: 'Skincare',
-    ctaLabel: 'Shop now',
-  },
-  {
-    id: '4',
-    imageUrl:
-      'https://images.unsplash.com/photo-1522338242992-e1a54906a8da?w=900&auto=format&fit=crop&q=80',
-    brandLabel: 'Hair care',
-    ctaLabel: 'Shop now',
-  },
-  {
-    id: '5',
-    imageUrl:
-      'https://images.unsplash.com/photo-1612817288484-6f916006741a?w=900&auto=format&fit=crop&q=80',
-    brandLabel: 'Body',
-    ctaLabel: 'Shop now',
-  },
-];
-
-const TOP_PICKS: TopPickProduct[] = CATALOG_PRODUCTS.slice(0, 5).map(({ categoryIds: _categoryIds, ...product }) => product);
-
-const PROMO_SLIDES: PromoImageSlide[] = [
-  { id: 'ps1', imageAsset: require('../../assets/demo/promo-slide-1.png') },
-  { id: 'ps2', imageAsset: require('../../assets/demo/promo-slide-2.png') },
-  { id: 'ps3', imageAsset: require('../../assets/demo/promo-slide-3.png') },
-  { id: 'ps4', imageAsset: require('../../assets/demo/promo-slide-4.png') },
-  { id: 'ps5', imageAsset: require('../../assets/demo/promo-slide-5.png') },
-];
-
-const GRID_SLIDES: ShopifyGridImageSlide[] = [
-  { id: 'gs1', imageAsset: require('../../assets/demo/shopify-grid-slide-1.png') },
-  { id: 'gs2', imageAsset: require('../../assets/demo/shopify-grid-slide-2.png') },
-  { id: 'gs3', imageAsset: require('../../assets/demo/shopify-grid-slide-3.png') },
-  { id: 'gs4', imageAsset: require('../../assets/demo/shopify-grid-slide-4.png') },
-  { id: 'gs5', imageAsset: require('../../assets/demo/shopify-grid-slide-5.png') },
-];
 
 export default function HomeScreen() {
   const scrollY = useRef(new Animated.Value(0)).current;
@@ -202,8 +140,8 @@ export default function HomeScreen() {
   }, []);
 
   const categories: CategoryItem[] = useMemo(() => {
-    const source = menuCategories ?? PRODUCT_CATEGORIES;
-    return source.map((category) => ({
+    if (!menuCategories?.length) return [];
+    return menuCategories.map((category) => ({
       id: category.id,
       title: category.id === 'all' ? 'All Category' : category.title,
       imageUrl: category.imageUrl,
@@ -265,12 +203,7 @@ export default function HomeScreen() {
   }, [openNotificationModal, storefrontLoading]);
 
   if (storefrontLoading) {
-    return (
-      <View style={[styles.root, styles.loadingScreen, { backgroundColor: headerTheme.pageBackground }]}>
-        <ActivityIndicator size="large" color={colors.headerBlue} />
-        <Text style={styles.loadingText}>Loading store…</Text>
-      </View>
-    );
+    return <StoreLoadingView message="Loading store…" />;
   }
 
   return (
@@ -292,29 +225,29 @@ export default function HomeScreen() {
         />
       </View>
       {/* <AnnouncementBar /> */}
-      <HeroCarousel slides={heroSlides ?? DEFAULT_HERO_SLIDES} />
-      <ShopByCategory categories={categories} />
-      <TopPicksPanel
-        title="Likenti Top Picks"
-        products={topPicksProducts ?? TOP_PICKS}
-        onPressItem={(item) => navigation.navigate('ProductDetail', { product: item })}
-        onPressAdd={(item) => {
-          const unitPrice = parsePrice(item.newPrice);
-          const compareParsed = parsePrice(item.oldPrice);
-          addItem({
-            id: item.id,
-            title: item.title,
-            variantTitle: 'Default',
-            imageUrl: item.imageUrl,
-            unitPrice,
-            compareAtPrice: compareParsed > unitPrice ? compareParsed : undefined,
-            quantity: 1,
-            inventoryNote: 'Ships in 24 hours',
-          });
-        }}
-      />
-      <PromoImageCarousel slides={PROMO_SLIDES} height={200} />
-      <ShopifyGridImageSlider slides={GRID_SLIDES} />
+      {heroSlides && heroSlides.length > 0 ? <HeroCarousel slides={heroSlides} /> : null}
+      {categories.length > 0 ? <ShopByCategory categories={categories} /> : null}
+      {topPicksProducts && topPicksProducts.length > 0 ? (
+        <TopPicksPanel
+          title="Likenti Top Picks"
+          products={topPicksProducts}
+          onPressItem={(item) => navigation.navigate('ProductDetail', { product: item })}
+          onPressAdd={(item) => {
+            const unitPrice = parsePrice(item.newPrice);
+            const compareParsed = parsePrice(item.oldPrice);
+            addItem({
+              id: item.id,
+              title: item.title,
+              variantTitle: 'Default',
+              imageUrl: item.imageUrl,
+              unitPrice,
+              compareAtPrice: compareParsed > unitPrice ? compareParsed : undefined,
+              quantity: 1,
+              inventoryNote: 'Ships in 24 hours',
+            });
+          }}
+        />
+      ) : null}
       <Modal
         visible={notificationVisible}
         transparent
